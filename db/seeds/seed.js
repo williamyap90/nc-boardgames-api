@@ -1,15 +1,20 @@
-const db = require('../connection.js');
-const format = require('pg-format');
-const { formatData, formatCategoryData } = require('../utils/data-manipulation.js');
-const { categoryData, commentData, reviewData, userData } = require('../data/development-data/index.js');
+const db = require("../connection.js");
+const format = require("pg-format");
+const { formatData } = require("../utils/data-manipulation.js");
+const {
+  categoryData,
+  commentData,
+  reviewData,
+  userData,
+} = require("../data/development-data/index.js");
 
 const seed = async (data) => {
   const { categoryData, commentData, reviewData, userData } = data;
-  await db.query('DROP TABLE IF EXISTS comments;');
-  await db.query('DROP TABLE IF EXISTS reviews;');
-  await db.query('DROP TABLE IF EXISTS users;');
-  await db.query('DROP TABLE IF EXISTS categories;');
-  
+  await db.query("DROP TABLE IF EXISTS comments;");
+  await db.query("DROP TABLE IF EXISTS reviews;");
+  await db.query("DROP TABLE IF EXISTS users;");
+  await db.query("DROP TABLE IF EXISTS categories;");
+
   await db.query(`
     CREATE TABLE categories (
       slug TEXT PRIMARY KEY,
@@ -54,42 +59,49 @@ const seed = async (data) => {
   console.log("Comments created");
 
   const formattedUserData = formatData(userData);
-  
-  const userInsertString = format(`
+  const userInsertString = format(
+    `
     INSERT INTO users
-    (username, name, avatar_url)
+      (username, name, avatar_url)
     VALUES
-    %L
+      %L
     RETURNING *;
-  `, formattedUserData)
-  await db.query(userInsertString)
-  console.log("<-- users inserted");
+  `,
+    formattedUserData
+  );
+  await db.query(userInsertString);
+  console.log("users inserted");
 
-  const formattedCategoryData = formatCategoryData(categoryData);
-  const categoryInsertString = format(`
+  const formattedCategoryData = formatData(categoryData);
+  const categoryInsertString = format(
+    `
     INSERT INTO categories
-    (slug, description)
+      (slug, description)
     VALUES
-    %L
+      %L
     RETURNING *;
-  `, formattedCategoryData);
+  `,
+    formattedCategoryData
+  );
   await db.query(categoryInsertString);
-  console.log("<-- categories inserted");
+  console.log("categories inserted");
 
-  const formattedReviewData = formatReviewData(reviewData);
-  const reviewInsertString = format(`
-    INSERT INTO reviews
-    (title, designer, owner, review_img_url, review_body, category, created_at, votes)
-    VALUES
-    %L
-    RETURNING *;
-  `, formattedReviewData);
-  console.log(reviewInsertString, "<-- review insert");
+  // FORMAT REVIEW DATA IN PROGRESS
+  // Upto below
+  // const formattedReviewData = formatReviewData(reviewData);
+  // const reviewInsertString = format(
+  //   `
+  //   INSERT INTO reviews
+  //     (title, designer, owner, review_img_url, review_body, category, created_at, votes)
+  //   VALUES
+  //     %L
+  //   RETURNING *;
+  // `,
+  //   formattedReviewData
+  // );
+  // console.log(reviewInsertString, "<-- review insert");
   // await db.query(reviewInsertString);
   // console.log("<-- categories inserted");
 };
 
-
 module.exports = seed;
-
-
