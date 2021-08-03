@@ -8,12 +8,12 @@ beforeEach(() => seed(testData));
 afterAll(() => db.end());
 
 describe("/api", () => {
-  test("GET - status 200, response from the api endpoint", async () => {
+  test("GET - 200: response from the api endpoint", async () => {
     const res = await request(app).get("/api").expect(200);
     expect(res.body.msg).toBe("All ok from /api");
   });
   describe("/api/notapath", () => {
-    test("404 - returns custom error message", async () => {
+    test("404: responds with custom error message", async () => {
       const res = await request(app).get("/api/notapath").expect(404);
       expect(res.body.msg).toBe("invalid path");
     });
@@ -22,7 +22,7 @@ describe("/api", () => {
 
 describe("/api/categories", () => {
   describe("GET", () => {
-    test("200, returns a array of categories", async () => {
+    test("200: responds with an array of categories", async () => {
       const res = await request(app).get("/api/categories").expect(200);
       expect(Array.isArray(res.body)).toBe(true);
       expect(res.body).toHaveLength(4);
@@ -32,10 +32,27 @@ describe("/api/categories", () => {
 
 describe("/api/reviews", () => {
   describe("/api/reviews/:review_id", () => {
-    test("200, returns an array of the specified review id", async () => {
+    test("200: responds with an array of the specified review id", async () => {
       const res = await request(app).get("/api/reviews/2").expect(200);
       expect(Array.isArray(res.body)).toBe(true);
       expect(res.body).toHaveLength(1);
     });
+    test("200: responds with an array of the specified review id in the correct format", async () => {
+      const res = await request(app).get("/api/reviews/2").expect(200);
+      res.body.forEach((review) => {
+        expect(review).toHaveProperty("owner");
+        expect(review).toHaveProperty("title");
+        expect(review).toHaveProperty("review_id");
+        expect(review).toHaveProperty("review_body");
+        expect(review).toHaveProperty("designer");
+        expect(review).toHaveProperty("review_img_url");
+        expect(review).toHaveProperty("category");
+        expect(review).toHaveProperty("created_at");
+        expect(review).toHaveProperty("votes");
+        expect(review).toHaveProperty("comment_count");
+      });
+    });
+    //400: responds with a message for invalid review_id
+    //404: responds with not found for valid but non-existent review_id
   });
 });
