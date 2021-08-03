@@ -15,7 +15,10 @@ describe("/api", () => {
 });
 
 describe("/api/notapath", () => {
-  test("404 - returns custom error message", async () => {});
+  test("404 - returns custom error message", async () => {
+    const res = await request(app).get("/api/notapath").expect(404);
+    expect(res.body.msg).toBe("invalid path");
+  });
 });
 
 describe("/api/categories", () => {
