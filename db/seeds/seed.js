@@ -15,7 +15,7 @@ const seed = async (data) => {
 
   await db.query(`
     CREATE TABLE categories (
-      slug TEXT PRIMARY KEY,
+      slug VARCHAR(100) PRIMARY KEY,
       description VARCHAR(200) NOT NULL
     );
   `);
@@ -23,9 +23,9 @@ const seed = async (data) => {
 
   await db.query(`
     CREATE TABLE users (
-      username TEXT PRIMARY KEY,
+      username VARCHAR(100) PRIMARY KEY,
       avatar_url VARCHAR(200) NOT NULL,
-      name VARCHAR(100)
+      name VARCHAR(100) NOT NULL
     );
   `);
   console.log("Users created");
@@ -34,12 +34,12 @@ const seed = async (data) => {
     CREATE TABLE reviews (
       review_id SERIAL PRIMARY KEY,
       title VARCHAR(200) NOT NULL,
-      review_body TEXT NOT NULL,
+      review_body VARCHAR(1000) NOT NULL,
       designer VARCHAR(100) NOT NULL,
-      review_img_url TEXT DEFAULT 'https://images.pexels.com/photos/163064/play-stone-network-networked-interactive-163064.jpeg',
-      votes INT DEFAULT 0,
-      category TEXT REFERENCES categories(slug),
-      owner TEXT REFERENCES users(username),
+      review_img_url VARCHAR(200) DEFAULT 'https://images.pexels.com/photos/163064/play-stone-network-networked-interactive-163064.jpeg' NOT NULL,
+      votes INT DEFAULT 0 NOT NULL,
+      category VARCHAR(100) REFERENCES categories(slug),
+      owner VARCHAR(100) REFERENCES users(username),
       created_at TIMESTAMP DEFAULT NOW()
      );
   `);
@@ -48,11 +48,11 @@ const seed = async (data) => {
   await db.query(`
     CREATE TABLE comments (
       comment_id SERIAL PRIMARY KEY,
-      author TEXT REFERENCES users(username) NOT NULL,
-      review_id INT REFERENCES reviews(review_id),
-      votes INT DEFAULT 0,
+      author VARCHAR(100) REFERENCES users(username) NOT NULL,
+      review_id INT REFERENCES reviews(review_id) NOT NULL,
+      votes INT DEFAULT 0 NOT NULL,
       created_at TIMESTAMP DEFAULT NOW(),
-      body TEXT
+      body VARCHAR(1000) NOT NULL
     );
   `);
   console.log("Comments created");
