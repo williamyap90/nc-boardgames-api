@@ -1,10 +1,13 @@
 const express = require("express");
-const categoriesRouter = require("./categories.router");
 const apiRouter = express.Router();
+const categoriesRouter = require("./categories.router");
+const reviewsRouter = require("./reviews.router");
 
 apiRouter.get("/", (req, res) => {
   res.status(200).send({ msg: "All ok from /api" });
 });
+
 apiRouter.use("/categories", categoriesRouter);
+apiRouter.use("/reviews", reviewsRouter);
 
 module.exports = apiRouter;
