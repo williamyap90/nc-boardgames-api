@@ -19,7 +19,6 @@ const seed = async (data) => {
       description VARCHAR(200) NOT NULL
     );
   `);
-  console.log("Categories created");
 
   await db.query(`
     CREATE TABLE users (
@@ -28,7 +27,6 @@ const seed = async (data) => {
       name VARCHAR(100) NOT NULL
     );
   `);
-  console.log("Users created");
 
   await db.query(`
     CREATE TABLE reviews (
@@ -43,7 +41,6 @@ const seed = async (data) => {
       created_at TIMESTAMP DEFAULT NOW()
      );
   `);
-  console.log("Reviews created");
 
   await db.query(`
     CREATE TABLE comments (
@@ -55,7 +52,6 @@ const seed = async (data) => {
       body VARCHAR(1000) NOT NULL
     );
   `);
-  console.log("Comments created");
 
   const formattedUserData = formatData(userData);
   const userInsertString = format(
@@ -69,7 +65,6 @@ const seed = async (data) => {
     formattedUserData
   );
   await db.query(userInsertString);
-  console.log("Users inserted");
 
   const formattedCategoryData = formatData(categoryData);
   const categoryInsertString = format(
@@ -83,7 +78,6 @@ const seed = async (data) => {
     formattedCategoryData
   );
   await db.query(categoryInsertString);
-  console.log("Categories inserted");
 
   const formattedReviewData = formatData(reviewData);
   const reviewInsertString = format(
@@ -96,7 +90,6 @@ const seed = async (data) => {
   `,
     formattedReviewData
   );
-  console.log("Reviews inserted");
   const reviews = await db.query(reviewInsertString);
 
   const commentsRefObj = createCommentsRefObj(reviews.rows);
@@ -113,7 +106,6 @@ const seed = async (data) => {
     formattedCommentsData
   );
   await db.query(commentsInsertString);
-  console.log("Comments inserted");
 };
 
 module.exports = seed;
