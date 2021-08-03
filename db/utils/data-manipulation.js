@@ -39,7 +39,7 @@ exports.formatCommentsData = (data, commentsRefObj) => {
       newComment.created_by,
       newComment.review_id,
       newComment.votes,
-      newComment.created_at.toISOString(),
+      newComment.created_at,
       newComment.body,
     ];
   });

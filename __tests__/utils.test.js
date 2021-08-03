@@ -312,7 +312,7 @@ describe("formatCommentsData()", () => {
         "jessjelly",
         24,
         9,
-        "2021-03-27T14:15:31.110Z",
+        new Date(1616854531110),
         "Ex id ipsum dolore non cillum anim sint duis nisi anim deserunt nisi minim. Fugiat sint et proident ex do consequat est. Nisi minim laboris mollit cupidatat.",
       ],
     ]);
