@@ -12,12 +12,11 @@ describe("/api", () => {
     const res = await request(app).get("/api").expect(200);
     expect(res.body.msg).toBe("All ok from /api");
   });
-});
-
-describe("/api/notapath", () => {
-  test("404 - returns custom error message", async () => {
-    const res = await request(app).get("/api/notapath").expect(404);
-    expect(res.body.msg).toBe("invalid path");
+  describe("/api/notapath", () => {
+    test("404 - returns custom error message", async () => {
+      const res = await request(app).get("/api/notapath").expect(404);
+      expect(res.body.msg).toBe("invalid path");
+    });
   });
 });
 
@@ -27,6 +26,16 @@ describe("/api/categories", () => {
       const res = await request(app).get("/api/categories").expect(200);
       expect(Array.isArray(res.body)).toBe(true);
       expect(res.body).toHaveLength(4);
+    });
+  });
+});
+
+describe("/api/reviews", () => {
+  describe("/api/reviews/:review_id", () => {
+    test("200, returns an array of the specified review id", async () => {
+      const res = await request(app).get("/api/reviews/2").expect(200);
+      expect(Array.isArray(res.body)).toBe(true);
+      expect(res.body).toHaveLength(1);
     });
   });
 });
