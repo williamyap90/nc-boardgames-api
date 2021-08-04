@@ -5,7 +5,7 @@ exports.fetchReviewById = async ({ review_id }) => {
   let queryString = `
         SELECT reviews.owner, title, reviews.review_id, review_body, designer, review_img_url, category, reviews.created_at, reviews.votes, COUNT(comment_id) AS comment_count
         FROM reviews 
-        JOIN comments 
+        LEFT JOIN comments 
         ON reviews.review_id = comments.review_id 
         WHERE reviews.review_id=$1
         GROUP BY reviews.owner, reviews.title, reviews.review_id;
@@ -30,7 +30,7 @@ exports.patchReviewById = async ({ updateBody, review_id }) => {
     if (!validUpdates.includes(key)) {
       return Promise.reject({
         status: 400,
-        message: `The property "${key}" is not valid in updateBody`,
+        message: `The property "${key}" is not valid in update body`,
       });
     }
   }
@@ -60,5 +60,49 @@ exports.patchReviewById = async ({ updateBody, review_id }) => {
       message: `Review id ${review_id} not found`,
     });
   }
+  return rows;
+};
+
+exports.fetchReviews = async (query) => {
+  const { sort_by = "created_at", order = "asc", category } = query;
+
+  const validColumns = [
+    "owner",
+    "title",
+    "review_id",
+    "category",
+    "review_img_url",
+    "created_at",
+    "votes",
+    "comment_id",
+  ];
+  if (!validColumns.includes(sort_by)) {
+    return Promise.reject({
+      status: 400,
+      message: `Invalid sort query, column "${sort_by}" does not exist`,
+    });
+  }
+
+  const validOrder = ["asc", "desc"];
+  if (!validOrder.includes(order)) {
+    return Promise.reject({
+      status: 400,
+      message: `Invalid order by query, cannot order by "${order}"`,
+    });
+  }
+
+  const queryValues = [sort_by, order.toUpperCase()];
+  console.log(queryValues, "<< queryValues");
+
+  let queryString = `
+        SELECT reviews.owner, title, reviews.review_id, category, review_img_url, reviews.created_at, reviews.votes, COUNT(comment_id) AS comment_count
+        FROM reviews 
+        LEFT JOIN comments 
+        ON reviews.review_id = comments.review_id 
+        GROUP BY reviews.owner, reviews.title, reviews.review_id
+        ORDER BY ${sort_by} ${order.toUpperCase()};
+    `;
+  //check if category filter exists, push to queryValues, append 'WHERE....' to queryStr
+  const { rows } = await db.query(queryString);
   return rows;
 };
