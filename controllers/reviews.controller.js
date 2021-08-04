@@ -7,6 +7,8 @@ exports.getReviewById = (req, res, next) => {
       res.status(200).send(result);
     })
     .catch((err) => {
+      //   console.log(err, "err in controller");
+      //   console.log(err.status, err.message);
       next(err);
     });
 };

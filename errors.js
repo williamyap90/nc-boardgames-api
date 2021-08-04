@@ -2,9 +2,19 @@ exports.handleRouter404s = (req, res, next) => {
   res.status(404).send({ message: "Invalid path" });
 };
 
-exports.handlePSQLErrors = (err, req, res, net) => {
+exports.handlePSQLErrors = (err, req, res, next) => {
   if (err.code === "22P02") {
     res.status(400).send({ message: "Invalid review_id" });
+  } else {
+    next(err);
+  }
+};
+
+exports.handleCustomErrors = (err, req, res, next) => {
+  if (err.status !== undefined) {
+    res.status(err.status).send(err.message);
+  } else {
+    next(err);
   }
 };
 

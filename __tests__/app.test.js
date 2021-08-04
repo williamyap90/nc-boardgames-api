@@ -10,12 +10,12 @@ afterAll(() => db.end());
 describe("/api", () => {
   test("GET - 200: response from the api endpoint", async () => {
     const res = await request(app).get("/api").expect(200);
-    expect(res.body.msg).toBe("All ok from /api");
+    expect(res.body.message).toBe("All ok from /api");
   });
-  describe("/api/notapath", () => {
+  describe("GET /api/notAPath", () => {
     test("404: responds with custom error message", async () => {
-      const res = await request(app).get("/api/notapath").expect(404);
-      expect(res.body.msg).toBe("invalid path");
+      const res = await request(app).get("/api/notAPath").expect(404);
+      expect(res.body.message).toBe("Invalid path");
     });
   });
 });
@@ -31,7 +31,7 @@ describe("/api/categories", () => {
 });
 
 describe("/api/reviews", () => {
-  describe("/api/reviews/:review_id", () => {
+  describe("GET /api/reviews/:review_id", () => {
     test("200: responds with an array of the specified review id", async () => {
       const res = await request(app).get("/api/reviews/2").expect(200);
       expect(Array.isArray(res.body)).toBe(true);
@@ -52,7 +52,13 @@ describe("/api/reviews", () => {
         expect(review).toHaveProperty("comment_count");
       });
     });
-    //400: responds with a message for invalid review_id
-    //404: responds with not found for valid but non-existent review_id
+    test("400: responds with a message for invalid review_id ", async () => {
+      const res = await request(app).get("/api/reviews/notAnId").expect(400);
+      expect(res.body.message).toBe("Invalid review_id");
+    });
+    test("404: responds with not found for valid but non-existent review_id ", async () => {
+      const res = await request(app).get("/api/reviews/99999").expect(404);
+      expect(res.text).toBe("Review id 99999 not found");
+    });
   });
 });
