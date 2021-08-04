@@ -13,10 +13,10 @@ exports.getReviewById = (req, res, next) => {
 };
 
 exports.updateReviewById = (req, res, next) => {
-  const { inc_votes } = req.body;
+  const updateBody = req.body;
   const { review_id } = req.params;
 
-  patchReviewById({ inc_votes, review_id })
+  patchReviewById({ updateBody, review_id })
     .then((review) => {
       res.status(201).send(review);
     })

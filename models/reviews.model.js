@@ -22,7 +22,20 @@ exports.fetchReviewById = async ({ review_id }) => {
   return rows;
 };
 
-exports.patchReviewById = async ({ inc_votes, review_id }) => {
+exports.patchReviewById = async ({ updateBody, review_id }) => {
+  const validUpdates = ["inc_votes"];
+
+  // check updateBody properties
+  for (let key in updateBody) {
+    if (!validUpdates.includes(key)) {
+      return Promise.reject({
+        status: 400,
+        message: `The property "${key}" is not valid in updateBody`,
+      });
+    }
+  }
+  const { inc_votes } = updateBody;
+
   if (!inc_votes) {
     return Promise.reject({
       status: 400,
@@ -31,7 +44,6 @@ exports.patchReviewById = async ({ inc_votes, review_id }) => {
   }
 
   const queryValues = [review_id, inc_votes];
-  console.log(queryValues, "id,inc_votes");
 
   let queryString = `
         UPDATE reviews

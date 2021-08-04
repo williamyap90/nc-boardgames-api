@@ -120,15 +120,13 @@ describe("/api/reviews", () => {
         'invalid input syntax for type integer: "cat"'
       );
     });
-    test.only("400: responds with a message when invalid properties present in request body", async () => {
-      const updateBody = { inc_votes: "cat", name: "mitch" };
+    test("400: responds with a message when invalid properties present in request body", async () => {
+      const updateBody = { inc_votes: "1", name: "mitch" };
       const res = await request(app)
         .patch("/api/reviews/2")
         .send(updateBody)
         .expect(400);
-      expect(res.body.message).toBe(
-        'invalid input syntax for type integer: "cat"'
-      );
+      expect(res.text).toBe('The property "name" is not valid in updateBody');
     });
   });
 });
