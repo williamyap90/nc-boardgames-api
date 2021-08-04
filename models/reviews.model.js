@@ -5,10 +5,9 @@ exports.fetchReviewById = async ({ review_id }) => {
   let queryString = `
         SELECT reviews.owner, title, reviews.review_id, review_body, designer, review_img_url, category, reviews.created_at, reviews.votes, COUNT(comment_id) AS comment_count
         FROM reviews 
-        LEFT JOIN comments 
-        ON reviews.review_id = comments.review_id 
+        LEFT JOIN comments ON reviews.review_id = comments.review_id 
         WHERE reviews.review_id=$1
-        GROUP BY reviews.owner, reviews.title, reviews.review_id;
+        GROUP BY reviews.review_id;
     `;
 
   const { rows } = await db.query(queryString, queryValue);
@@ -91,18 +90,24 @@ exports.fetchReviews = async (query) => {
     });
   }
 
-  const queryValues = [sort_by, order.toUpperCase()];
-  console.log(queryValues, "<< queryValues");
+  const queryValues = [];
 
   let queryString = `
         SELECT reviews.owner, title, reviews.review_id, category, review_img_url, reviews.created_at, reviews.votes, COUNT(comment_id) AS comment_count
         FROM reviews 
-        LEFT JOIN comments 
-        ON reviews.review_id = comments.review_id 
-        GROUP BY reviews.owner, reviews.title, reviews.review_id
-        ORDER BY ${sort_by} ${order.toUpperCase()};
-    `;
-  //check if category filter exists, push to queryValues, append 'WHERE....' to queryStr
-  const { rows } = await db.query(queryString);
+        LEFT JOIN comments ON reviews.review_id = comments.review_id `;
+  if (category) {
+    queryValues.push(category);
+    queryString += "WHERE category=$1 ";
+  }
+  let queryStringEnd = `
+        GROUP BY reviews.review_id
+        ORDER BY ${sort_by} ${order.toUpperCase()};`;
+
+  const { rows } = await db.query(
+    `${queryString} ${queryStringEnd} `,
+    queryValues
+  );
+
   return rows;
 };

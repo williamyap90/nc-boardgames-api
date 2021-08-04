@@ -209,6 +209,7 @@ describe("/api/reviews", () => {
       const res = await request(app)
         .get("/api/reviews?category=dexterity")
         .expect(200);
+      expect(Array.isArray(res.body)).toBe(true);
     });
   });
 });
