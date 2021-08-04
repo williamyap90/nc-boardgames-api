@@ -65,7 +65,7 @@ describe("/api/reviews", () => {
   });
 
   describe("PATCH /:review_id", () => {
-    test("201: responds with the updated object for specified review_id ", async () => {
+    test("201: responds with the updated object for specified review_id", async () => {
       const updateVotes = { inc_votes: 3 };
       const res = await request(app)
         .patch("/api/reviews/2")
@@ -83,6 +83,22 @@ describe("/api/reviews", () => {
         expect(review).toHaveProperty("created_at");
         expect(review).toHaveProperty("votes");
       });
+    });
+    test("201: responds with the updated object for specified review_id", async () => {
+      const updateVotes = { inc_votes: -100 };
+      const res = await request(app)
+        .patch("/api/reviews/8")
+        .send(updateVotes)
+        .expect(201);
+      expect(res.body[0].votes).toEqual(0);
+    });
+    test("201: responds with the updated object for specified review_id, with a vote of zero to avoid negative values", async () => {
+      const updateVotes = { inc_votes: -100 };
+      const res = await request(app)
+        .patch("/api/reviews/2")
+        .send(updateVotes)
+        .expect(201);
+      expect(res.body[0].votes).toEqual(0);
     });
     test("400: responds with a message for invalid review_id ", async () => {
       const updateVotes = { inc_votes: 3 };
@@ -126,7 +142,7 @@ describe("/api/reviews", () => {
         .patch("/api/reviews/2")
         .send(updateBody)
         .expect(400);
-      expect(res.text).toBe('The property "name" is not valid in updateBody');
+      expect(res.text).toBe('The property "name" is not valid in update body');
     });
   });
 });
