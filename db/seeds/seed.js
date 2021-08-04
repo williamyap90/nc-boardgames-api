@@ -36,8 +36,8 @@ const seed = async (data) => {
       designer VARCHAR(100) NOT NULL,
       review_img_url VARCHAR(200) DEFAULT 'https://images.pexels.com/photos/163064/play-stone-network-networked-interactive-163064.jpeg' NOT NULL,
       votes INT DEFAULT 0 NOT NULL,
-      category VARCHAR(100) REFERENCES categories(slug),
-      owner VARCHAR(100) REFERENCES users(username),
+      category VARCHAR(100) REFERENCES categories(slug) ON DELETE CASCADE,
+      owner VARCHAR(100) REFERENCES users(username) ON DELETE CASCADE,
       created_at TIMESTAMP DEFAULT NOW()
      );
   `);
@@ -45,8 +45,8 @@ const seed = async (data) => {
   await db.query(`
     CREATE TABLE comments (
       comment_id SERIAL PRIMARY KEY,
-      author VARCHAR(100) REFERENCES users(username) NOT NULL,
-      review_id INT REFERENCES reviews(review_id) NOT NULL,
+      author VARCHAR(100) REFERENCES users(username) NOT NULL ON DELETE CASCADE,
+      review_id INT REFERENCES reviews(review_id) NOT NULL ON DELETE CASCADE,
       votes INT DEFAULT 0 NOT NULL,
       created_at TIMESTAMP DEFAULT NOW(),
       body VARCHAR(1000) NOT NULL
