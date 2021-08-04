@@ -45,8 +45,8 @@ const seed = async (data) => {
   await db.query(`
     CREATE TABLE comments (
       comment_id SERIAL PRIMARY KEY,
-      author VARCHAR(100) REFERENCES users(username) NOT NULL ON DELETE CASCADE,
-      review_id INT REFERENCES reviews(review_id) NOT NULL ON DELETE CASCADE,
+      author VARCHAR(100) REFERENCES users(username) ON DELETE CASCADE NOT NULL,
+      review_id INT REFERENCES reviews(review_id) ON DELETE CASCADE NOT NULL,
       votes INT DEFAULT 0 NOT NULL,
       created_at TIMESTAMP DEFAULT NOW(),
       body VARCHAR(1000) NOT NULL
