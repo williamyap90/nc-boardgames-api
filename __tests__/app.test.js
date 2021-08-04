@@ -145,4 +145,70 @@ describe("/api/reviews", () => {
       expect(res.text).toBe('The property "name" is not valid in update body');
     });
   });
+  describe("GET /", () => {
+    test("200: responds with array of objects with the correct properties", async () => {
+      const res = await request(app).get("/api/reviews").expect(200);
+      expect(Array.isArray(res.body)).toBe(true);
+      expect(res.body.length).toBe(13);
+      res.body.forEach((review) => {
+        expect(review).toHaveProperty("owner");
+        expect(review).toHaveProperty("title");
+        expect(review).toHaveProperty("category");
+        expect(review).toHaveProperty("created_at");
+        expect(review).toHaveProperty("votes");
+        expect(review).toHaveProperty("comment_count");
+      });
+    });
+    test("200: responds with array of objects sorted by review_id", async () => {
+      const res = await request(app)
+        .get("/api/reviews?sort_by=review_id")
+        .expect(200);
+      expect(Array.isArray(res.body)).toBe(true);
+      expect(res.body.length).toBe(13);
+      expect(res.body).toBeSortedBy("review_id");
+    });
+    test("200: responds with array of objects sorted by date (created_at) by default", async () => {
+      const res = await request(app).get("/api/reviews").expect(200);
+      expect(Array.isArray(res.body)).toBe(true);
+      expect(res.body.length).toBe(13);
+      expect(res.body).toBeSortedBy("created_at");
+    });
+    test("400: responds with a message when attempting to sort by an invalid column", async () => {
+      const res = await request(app)
+        .get("/api/reviews?sort_by=invalidSort")
+        .expect(400);
+      expect(res.text).toBe(
+        'Invalid sort query, column "invalidSort" does not exist'
+      );
+    });
+    test("200: responds with array of objects sorted by votes, in ascending order by default", async () => {
+      const res = await request(app)
+        .get("/api/reviews?sort_by=votes")
+        .expect(200);
+      expect(Array.isArray(res.body)).toBe(true);
+      expect(res.body.length).toBe(13);
+      expect(res.body).toBeSortedBy("votes", { descending: false });
+    });
+    test("200: responds with array of objects sorted by votes in descending order", async () => {
+      const res = await request(app)
+        .get("/api/reviews?sort_by=votes&order=desc")
+        .expect(200);
+      expect(Array.isArray(res.body)).toBe(true);
+      expect(res.body.length).toBe(13);
+      expect(res.body).toBeSortedBy("votes", { descending: true });
+    });
+    test("400: responds with a message when attempting to order by an invalid value", async () => {
+      const res = await request(app)
+        .get("/api/reviews?votes&order=invalidOrder")
+        .expect(400);
+      expect(res.text).toBe(
+        'Invalid order by query, cannot order by "invalidOrder"'
+      );
+    });
+    test("200: responds with array of objects filtered by category query", async () => {
+      const res = await request(app)
+        .get("/api/reviews?category=dexterity")
+        .expect(200);
+    });
+  });
 });
