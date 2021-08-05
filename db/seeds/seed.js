@@ -38,7 +38,7 @@ const seed = async (data) => {
       votes INT DEFAULT 0 NOT NULL,
       category VARCHAR(100) REFERENCES categories(slug) ON DELETE CASCADE,
       owner VARCHAR(100) REFERENCES users(username) ON DELETE CASCADE,
-      created_at TIMESTAMP DEFAULT NOW()
+      created_at TIMESTAMP DEFAULT NOW() NOT NULL
      );
   `);
 
