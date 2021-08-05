@@ -30,5 +30,109 @@
         }
       ]
     }
+  },
+  "GET /api/reviews/:review_id": {
+    "description": "serves an array containing a single object of the specified review_id",
+    "queries": [],
+    "exampleResponse": {
+      "review": [
+        {
+          "owner": "philippaclaire9",
+          "title": "Jenga",
+          "review_id": 2,
+          "review_body": "Fiddly fun for all the family",
+          "designer": "Leslie Scott",
+          "review_img_url": "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png",
+          "category": "dexterity",
+          "created_at": "2021-01-18T10:01:41.251Z",
+          "votes": 5,
+          "comment_count": "3"
+        }
+      ]
+    }
+  },
+  "PATCH /api/reviews/:review_id": {
+    "description": "serves an array of a single updated object with new values",
+    "queries": ["inc_votes"],
+    "exampleResponse": {
+      "review": [
+        {
+          "review_id": 2,
+          "title": "Jenga",
+          "review_body": "Fiddly fun for all the family",
+          "designer": "Leslie Scott",
+          "review_img_url": "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png",
+          "votes": 8,
+          "category": "dexterity",
+          "owner": "philippaclaire9",
+          "created_at": "2021-01-18T10:01:41.251Z"
+        }
+      ]
+    }
+  },
+  "GET /api/reviews": {
+    "description": "serves an array of the reviews sorted by any queries",
+    "sortQueries": [
+      "owner",
+      "title",
+      "review_id",
+      "category",
+      "review_img_url",
+      "created_at",
+      "votes",
+      "comment_id"
+    ],
+    "orderQueries": ["asc", "desc"],
+    "otherFilters": "by category",
+    "exampleResponse": {
+      "reviews": [
+        {
+          "review_id": 2,
+          "title": "Jenga",
+          "review_body": "Fiddly fun for all the family",
+          "designer": "Leslie Scott",
+          "review_img_url": "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png",
+          "votes": 8,
+          "category": "dexterity",
+          "owner": "philippaclaire9",
+          "created_at": "2021-01-18T10:01:41.251Z"
+        }
+      ]
+    }
+  },
+  "GET /api/reviews/:review_id/comments": {
+    "description": "serves an array of comments on reviews for the specified review_id",
+    "queries": [],
+    "exampleResponse": {
+      "comment": [
+        {
+          "comment_id": 1,
+          "votes": 16,
+          "created_at": "2017-11-22T12:43:33.389Z",
+          "author": "bainesface",
+          "body": "I loved this game too!"
+        }
+      ]
+    }
+  },
+  "POST /api/reviews/:review_id/comments": {
+    "description": "serves an array of comments on reviews for the specified review_id",
+    "queries": [],
+    "exampleBody": {
+      "username": "mallionaire",
+      "body": "Thoroughly enjoyed this game"
+    },
+    "exampleResponse": {
+      "comment": [
+        {
+          "comment_id": 7,
+          "author": "mallionaire",
+          "review_id": 2,
+          "votes": 0,
+          "created_at": "2021-08-05T15:54:04.330Z",
+          "body": "Thoroughly enjoyed this game!"
+        }
+      ]
+    }
   }
 }

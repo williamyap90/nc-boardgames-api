@@ -8,7 +8,7 @@ beforeEach(() => seed(testData));
 afterAll(() => db.end());
 
 describe("/api", () => {
-  describe.only("GET", () => {
+  describe("GET", () => {
     test("200: response from the api endpoint", async () => {
       const res = await request(app).get("/api").expect(200);
       // expect(res.body.message).toBe("All ok from /api");
