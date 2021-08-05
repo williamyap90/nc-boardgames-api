@@ -1,4 +1,5 @@
 const db = require("../db/connection");
+const format = require("pg-format");
 
 exports.fetchReviewById = async ({ review_id }) => {
   const queryValue = [review_id];
@@ -108,7 +109,7 @@ exports.fetchReviews = async (query) => {
 
   // may have to change this bit
   if (rows.length === 0) {
-    const categoryExists = await checkCategoryExists(category);
+    const categoryExists = await checkExists("categories", "slug", category);
     if (!categoryExists) {
       return Promise.reject({
         status: 400,
@@ -119,25 +120,24 @@ exports.fetchReviews = async (query) => {
   return rows;
 };
 
-// make checkExists reusable
-const checkCategoryExists = async (category) => {
-  const response = await db.query(`SELECT * FROM categories WHERE slug=$1`, [
-    category,
-  ]);
-  if (response.rows.length === 0) {
-    return false;
-  } else {
-    return true;
-  }
-};
-
 exports.fetchReviewCommentsById = async ({ review_id }) => {
   let queryString = `
-        SELECT * FROM comments
-        WHERE comment_id = $1
+    SELECT * FROM comments
+    WHERE comment_id = $1
     `;
   const queryValues = [review_id];
 
   const { rows } = await db.query(queryString, queryValues);
   return rows;
+};
+
+const checkExists = async (table, column, value) => {
+  const queryStr = format("SELECT * FROM %I WHERE %I = $1;", table, column);
+  const dbOutput = await db.query(queryStr, [value]);
+
+  if (dbOutput.rows.length === 0) {
+    return false;
+  } else {
+    return true;
+  }
 };

@@ -58,14 +58,14 @@ describe("/api/reviews", () => {
         'invalid input syntax for type integer: "notAnId"'
       );
     });
-    test("404: responds with not found for valid but non-existent review_id ", async () => {
+    test("404: responds with a not found for valid value type but non-existent review_id ", async () => {
       const res = await request(app).get("/api/reviews/99999").expect(404);
       expect(res.text).toBe("Review id 99999 not found");
     });
   });
 
   describe("PATCH /:review_id", () => {
-    test("201: responds with the updated object for specified review_id", async () => {
+    test("201: responds with the updated object for specified review_id when increasing votes", async () => {
       const updateVotes = { inc_votes: 3 };
       const res = await request(app)
         .patch("/api/reviews/2")
@@ -84,7 +84,7 @@ describe("/api/reviews", () => {
         expect(review).toHaveProperty("votes");
       });
     });
-    test("201: responds with the updated object for specified review_id", async () => {
+    test("201: responds with the updated object for specified review_id when decreasing votes", async () => {
       const updateVotes = { inc_votes: -100 };
       const res = await request(app)
         .patch("/api/reviews/8")
@@ -145,6 +145,7 @@ describe("/api/reviews", () => {
       expect(res.text).toBe('The property "name" is not valid in update body');
     });
   });
+
   describe("GET /", () => {
     test("200: responds with array of objects with the correct properties", async () => {
       const res = await request(app).get("/api/reviews").expect(200);
@@ -238,8 +239,9 @@ describe("/api/reviews", () => {
       expect(res.body.length).toBe(0);
     });
   });
+
   describe("GET /:review_id/comments", () => {
-    test.only("200: responds with an array of comments for the given review_id", async () => {
+    test("200: responds with an array of comments for the given review_id", async () => {
       const res = await request(app).get("/api/reviews/2/comments").expect(200);
       expect(Array.isArray(res.body)).toBe(true);
       expect(res.body.length).toBe(1);
@@ -251,5 +253,14 @@ describe("/api/reviews", () => {
         expect(comment).toHaveProperty("body");
       });
     });
+    test("400: responds with a message for invalid comment_id", async () => {
+      const res = await request(app)
+        .get("/api/reviews/notAnId/comments")
+        .expect(400);
+      expect(res.body.message).toBe(
+        'invalid input syntax for type integer: "notAnId"'
+      );
+    });
+    // test("404: responds with a not found for valid value type but non-existent comment_id", () => {});
   });
 });
