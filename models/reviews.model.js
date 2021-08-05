@@ -130,3 +130,14 @@ const checkCategoryExists = async (category) => {
     return true;
   }
 };
+
+exports.fetchReviewCommentsById = async ({ review_id }) => {
+  let queryString = `
+        SELECT * FROM comments
+        WHERE comment_id = $1
+    `;
+  const queryValues = [review_id];
+
+  const { rows } = await db.query(queryString, queryValues);
+  return rows;
+};

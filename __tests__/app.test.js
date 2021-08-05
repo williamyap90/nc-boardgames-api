@@ -238,4 +238,18 @@ describe("/api/reviews", () => {
       expect(res.body.length).toBe(0);
     });
   });
+  describe("GET /:review_id/comments", () => {
+    test.only("200: responds with an array of comments for the given review_id", async () => {
+      const res = await request(app).get("/api/reviews/2/comments").expect(200);
+      expect(Array.isArray(res.body)).toBe(true);
+      expect(res.body.length).toBe(1);
+      res.body.forEach((comment) => {
+        expect(comment).toHaveProperty("comment_id");
+        expect(comment).toHaveProperty("votes");
+        expect(comment).toHaveProperty("created_at");
+        expect(comment).toHaveProperty("author");
+        expect(comment).toHaveProperty("body");
+      });
+    });
+  });
 });
