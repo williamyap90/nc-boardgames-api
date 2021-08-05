@@ -34,8 +34,8 @@ describe("/api/categories", () => {
   });
 });
 
-describe("/api/reviews", () => {
-  describe("GET /:review_id", () => {
+describe("/api/reviews/:review_id", () => {
+  describe("GET", () => {
     test("200: responds with an array of the specified review_id", async () => {
       const res = await request(app).get("/api/reviews/2").expect(200);
       expect(Array.isArray(res.body)).toBe(true);
@@ -67,8 +67,7 @@ describe("/api/reviews", () => {
       expect(res.text).toBe("Review id 99999 not found");
     });
   });
-
-  describe("PATCH /:review_id", () => {
+  describe("PATCH", () => {
     test("201: responds with the updated object for specified review_id when increasing votes", async () => {
       const updateVotes = { inc_votes: 3 };
       const res = await request(app)
@@ -149,8 +148,10 @@ describe("/api/reviews", () => {
       expect(res.text).toBe('The property "name" is not valid in update body');
     });
   });
+});
 
-  describe("GET /", () => {
+describe("/api/reviews", () => {
+  describe("GET", () => {
     test("200: responds with array of objects with the correct properties", async () => {
       const res = await request(app).get("/api/reviews").expect(200);
       expect(Array.isArray(res.body)).toBe(true);
@@ -243,8 +244,10 @@ describe("/api/reviews", () => {
       expect(res.body.length).toBe(0);
     });
   });
+});
 
-  describe("GET /:review_id/comments", () => {
+describe("/api/reviews/:review_id/comments", () => {
+  describe("GET", () => {
     test("200: responds with an array of comments for the given review_id", async () => {
       const res = await request(app).get("/api/reviews/2/comments").expect(200);
       expect(Array.isArray(res.body)).toBe(true);
@@ -272,7 +275,8 @@ describe("/api/reviews", () => {
       expect(res.text).toBe("Review id 99999 not found");
     });
   });
-  describe("POST /:review_id/comments", () => {
+
+  describe("POST", () => {
     test("200: responds with the posted comment", async () => {
       const postBody = {
         username: "mallionaire",
@@ -342,6 +346,16 @@ describe("/api/reviews", () => {
         .send(postBody)
         .expect(400);
       expect(res.text).toBe("Body text exceeds 1000 characters");
+    });
+  });
+});
+
+describe("/api/comments/:comment_id", () => {
+  describe("DELETE", () => {
+    test("204: responds with no content, delete the given comment by comment_id", async () => {
+      const res = await request(app).delete("/api/comments/3").expect(204);
+      const dbCheck = await db.query("SELECT * FROM comments;");
+      expect(dbCheck.rows).toHaveLength(5);
     });
   });
 });
