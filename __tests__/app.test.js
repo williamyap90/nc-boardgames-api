@@ -210,6 +210,32 @@ describe("/api/reviews", () => {
         .get("/api/reviews?category=dexterity")
         .expect(200);
       expect(Array.isArray(res.body)).toBe(true);
+      res.body.forEach((review) => {
+        expect(review).toHaveProperty("owner");
+        expect(review).toHaveProperty("title");
+        expect(review).toHaveProperty("category");
+        expect(review).toHaveProperty("created_at");
+        expect(review).toHaveProperty("votes");
+        expect(review).toHaveProperty("comment_count");
+        expect(review).toHaveProperty("review_img_url");
+        expect(review).toHaveProperty("review_id");
+        expect(review.category).toBe("dexterity");
+      });
     });
+    test("400: responds with a message when category does not exist in database", async () => {
+      const res = await request(app)
+        .get("/api/reviews?category=invalidCategory")
+        .expect(400);
+      expect(res.text).toBe(
+        'Invalid request, category "invalidCategory" does not exist'
+      );
+    });
+    // test.only("200: responds with an empty array when category exists but does not have any reviews", async () => {
+    //   const res = await request(app)
+    //     .get("/api/reviews?category=children's+games")
+    //     .expect(200);
+    //   console.log(res, "<<res");
+    //   expect(res.text).toBe("");
+    // });
   });
 });

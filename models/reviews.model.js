@@ -98,16 +98,36 @@ exports.fetchReviews = async (query) => {
         LEFT JOIN comments ON reviews.review_id = comments.review_id `;
   if (category) {
     queryValues.push(category);
-    queryString += "WHERE category=$1 ";
+    queryString += "WHERE category = $1 ";
   }
   let queryStringEnd = `
         GROUP BY reviews.review_id
         ORDER BY ${sort_by} ${order.toUpperCase()};`;
 
-  const { rows } = await db.query(
-    `${queryString} ${queryStringEnd} `,
-    queryValues
-  );
+  const { rows } = await db.query(queryString + queryStringEnd, queryValues);
 
+  // may have to change this bit
+  if (rows.length === 0) {
+    const categoryExists = await checkCategoryExists(category);
+    // console.log(categoryExists, "<< categoryExists", category, "<< category");
+    if (!categoryExists) {
+      return Promise.reject({
+        status: 400,
+        message: `Invalid request, category "${category}" does not exist`,
+      });
+    }
+  }
   return rows;
+};
+
+// make checkExists reusable
+const checkCategoryExists = async (category) => {
+  const response = await db.query(`SELECT * FROM categories WHERE slug=$1`, [
+    category,
+  ]);
+  if (response.rows.length === 0) {
+    return false;
+  } else {
+    return true;
+  }
 };
