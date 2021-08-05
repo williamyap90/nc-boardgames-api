@@ -271,7 +271,7 @@ describe("/api/reviews", () => {
   describe("POST /:review_id/comments", () => {
     test.only("200: responds with the posted comment", async () => {
       const postBody = {
-        username: "willliamyap0101",
+        username: "mallionaire",
         body: "Thoroughly enjoyed this game!",
       };
       const res = await request(app)
@@ -280,11 +280,14 @@ describe("/api/reviews", () => {
         .expect(201);
       expect(res.body.length).toBe(1);
       res.body.forEach((comment) => {
+        expect(comment).toHaveProperty("review_id");
+        expect(comment.review_id).toBe(2);
         expect(comment).toHaveProperty("comment_id");
         expect(comment).toHaveProperty("votes");
+        expect(comment.votes).toBe(0);
         expect(comment).toHaveProperty("created_at");
         expect(comment).toHaveProperty("author");
-        expect(comment.author).toEqual("williamyap0101");
+        expect(comment.author).toEqual("mallionaire");
         expect(comment).toHaveProperty("body");
         expect(comment.body).toEqual("Thoroughly enjoyed this game!");
       });

@@ -145,11 +145,12 @@ exports.insertNewComment = async ({ newComment, review_id }) => {
             (author, review_id, body)
         VALUES
             ($1, $2, $3)
+        RETURNING * ;
     `;
   const queryValues = [username, review_id, body];
 
   const { rows } = await db.query(queryString, queryValues);
-  console.log(rows);
+  return rows;
 };
 
 const checkExists = async (table, column, value) => {
