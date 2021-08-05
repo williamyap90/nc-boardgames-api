@@ -268,10 +268,26 @@ describe("/api/reviews", () => {
       expect(res.text).toBe("Review id 99999 not found");
     });
   });
-  // describe("POST /:review_id/comments", () => {
-  //   test("200: responds with the posted comment", async () => {
-  //     const postBody = { username: "", body: "" };
-  //     const res = await request(app).post("/api/reviews/")
-  //   });
-  // });
+  describe("POST /:review_id/comments", () => {
+    test.only("200: responds with the posted comment", async () => {
+      const postBody = {
+        username: "willliamyap0101",
+        body: "Thoroughly enjoyed this game!",
+      };
+      const res = await request(app)
+        .post("/api/reviews/2/comments")
+        .send(postBody)
+        .expect(201);
+      expect(res.body.length).toBe(1);
+      res.body.forEach((comment) => {
+        expect(comment).toHaveProperty("comment_id");
+        expect(comment).toHaveProperty("votes");
+        expect(comment).toHaveProperty("created_at");
+        expect(comment).toHaveProperty("author");
+        expect(comment.author).toEqual("williamyap0101");
+        expect(comment).toHaveProperty("body");
+        expect(comment.body).toEqual("Thoroughly enjoyed this game!");
+      });
+    });
+  });
 });

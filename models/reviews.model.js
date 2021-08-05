@@ -121,8 +121,8 @@ exports.fetchReviews = async (query) => {
 
 exports.fetchReviewCommentsById = async ({ review_id }) => {
   let queryString = `
-    SELECT comment_id, votes, created_at, author, body FROM comments
-    WHERE review_id = $1
+        SELECT comment_id, votes, created_at, author, body FROM comments
+        WHERE review_id = $1
     `;
   const queryValues = [review_id];
 
@@ -135,6 +135,21 @@ exports.fetchReviewCommentsById = async ({ review_id }) => {
     });
   }
   return rows;
+};
+
+exports.insertNewComment = async ({ newComment, review_id }) => {
+  const { username, body } = newComment;
+
+  const queryString = `
+        INSERT INTO comments
+            (author, review_id, body)
+        VALUES
+            ($1, $2, $3)
+    `;
+  const queryValues = [username, review_id, body];
+
+  const { rows } = await db.query(queryString, queryValues);
+  console.log(rows);
 };
 
 const checkExists = async (table, column, value) => {

@@ -3,6 +3,7 @@ const {
   patchReviewById,
   fetchReviews,
   fetchReviewCommentsById,
+  insertNewComment,
 } = require("../models/reviews.model");
 
 exports.getReviewById = (req, res, next) => {
@@ -50,4 +51,10 @@ exports.getReviewCommentsById = (req, res, next) => {
     .catch((err) => {
       next(err);
     });
+};
+
+exports.postNewComment = (req, res, next) => {
+  const newComment = req.body;
+  const { review_id } = req.params;
+  insertNewComment({ newComment, review_id });
 };
