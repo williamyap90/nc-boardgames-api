@@ -109,7 +109,6 @@ exports.fetchReviews = async (query) => {
   // may have to change this bit
   if (rows.length === 0) {
     const categoryExists = await checkCategoryExists(category);
-    // console.log(categoryExists, "<< categoryExists", category, "<< category");
     if (!categoryExists) {
       return Promise.reject({
         status: 400,

@@ -230,12 +230,12 @@ describe("/api/reviews", () => {
         'Invalid request, category "invalidCategory" does not exist'
       );
     });
-    // test.only("200: responds with an empty array when category exists but does not have any reviews", async () => {
-    //   const res = await request(app)
-    //     .get("/api/reviews?category=children's+games")
-    //     .expect(200);
-    //   console.log(res, "<<res");
-    //   expect(res.text).toBe("");
-    // });
+    test("200: responds with an empty array when category exists but does not have any reviews", async () => {
+      const res = await request(app)
+        .get("/api/reviews?category=children's+games")
+        .expect(200);
+      expect(Array.isArray(res.body)).toBe(true);
+      expect(res.body.length).toBe(0);
+    });
   });
 });
