@@ -8,14 +8,18 @@ beforeEach(() => seed(testData));
 afterAll(() => db.end());
 
 describe("/api", () => {
-  describe("GET", () => {
+  describe.only("GET", () => {
     test("200: response from the api endpoint", async () => {
       const res = await request(app).get("/api").expect(200);
-      expect(res.body.message).toBe("All ok from /api");
+      // expect(res.body.message).toBe("All ok from /api");
     });
     test("404: responds with custom error message when provided an invalid path", async () => {
       const res = await request(app).get("/api/notAPath").expect(404);
       expect(res.body.message).toBe("Invalid path");
+    });
+    test("200: responds with a JSON object of all the available endpoints on the server", async () => {
+      const res = await request(app).get("/api").expect(200);
+      expect(typeof res.body).toBe("object");
     });
   });
 });
