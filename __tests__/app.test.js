@@ -269,7 +269,7 @@ describe("/api/reviews", () => {
     });
   });
   describe("POST /:review_id/comments", () => {
-    test.only("200: responds with the posted comment", async () => {
+    test("200: responds with the posted comment", async () => {
       const postBody = {
         username: "mallionaire",
         body: "Thoroughly enjoyed this game!",
@@ -291,6 +291,53 @@ describe("/api/reviews", () => {
         expect(comment).toHaveProperty("body");
         expect(comment.body).toEqual("Thoroughly enjoyed this game!");
       });
+    });
+    test("400: responds with a message when invalid properties present in post body", async () => {
+      const postBody = {
+        username: "mallionaire",
+        body: "Thoroughly enjoyed this game!",
+        age: 30,
+      };
+      const res = await request(app)
+        .post("/api/reviews/2/comments")
+        .send(postBody)
+        .expect(400);
+      expect(res.text).toBe('The property "age" is not valid in post body');
+    });
+    test("404: responds with a review_id not found for valid value type but non-existent review_id", async () => {
+      const postBody = {
+        username: "mallionaire",
+        body: "Thoroughly enjoyed this game!",
+      };
+      const res = await request(app)
+        .post("/api/reviews/99999/comments")
+        .send(postBody)
+        .expect(404);
+      expect(res.text).toBe("Review id 99999 not found");
+    });
+    test("404: responds with an error message when attempting to send post request with a username not found", async () => {
+      const postBody = {
+        username: "williamyap0101",
+        body: "Thoroughly enjoyed this game!",
+      };
+      const res = await request(app)
+        .post("/api/reviews/2/comments")
+        .send(postBody)
+        .expect(404);
+      expect(res.text).toBe(
+        'Username "williamyap0101" not found in users table'
+      );
+    });
+    test("400: responds with an error message when attempting to send post request with body character length longer than VARCHAR(1000)", async () => {
+      const postBody = {
+        username: "mallionaire",
+        body: "x".repeat(1001),
+      };
+      const res = await request(app)
+        .post("/api/reviews/2/comments")
+        .send(postBody)
+        .expect(400);
+      expect(res.text).toBe("Body text exceeds 1000 characters");
     });
   });
 });

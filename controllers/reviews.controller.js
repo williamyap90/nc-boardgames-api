@@ -56,7 +56,11 @@ exports.getReviewCommentsById = (req, res, next) => {
 exports.postNewComment = (req, res, next) => {
   const newComment = req.body;
   const { review_id } = req.params;
-  insertNewComment({ newComment, review_id }).then((comment) => {
-    res.status(201).send(comment);
-  });
+  insertNewComment({ newComment, review_id })
+    .then((comment) => {
+      res.status(201).send(comment);
+    })
+    .catch((err) => {
+      next(err);
+    });
 };

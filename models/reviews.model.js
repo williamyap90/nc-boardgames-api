@@ -24,7 +24,6 @@ exports.fetchReviewById = async ({ review_id }) => {
 
 exports.patchReviewById = async ({ updateBody, review_id }) => {
   const validUpdates = ["inc_votes"];
-
   // check updateBody properties
   for (let key in updateBody) {
     if (!validUpdates.includes(key)) {
@@ -34,6 +33,7 @@ exports.patchReviewById = async ({ updateBody, review_id }) => {
       });
     }
   }
+
   const { inc_votes } = updateBody;
 
   if (!inc_votes) {
@@ -140,6 +140,40 @@ exports.fetchReviewCommentsById = async ({ review_id }) => {
 exports.insertNewComment = async ({ newComment, review_id }) => {
   const { username, body } = newComment;
 
+  const validPostProp = ["username", "body"];
+  // check postBody (newComment) properties
+  for (let key in newComment) {
+    if (!validPostProp.includes(key)) {
+      return Promise.reject({
+        status: 400,
+        message: `The property "${key}" is not valid in post body`,
+      });
+    }
+  }
+
+  const reviewIdExists = await checkExists("reviews", "review_id", review_id);
+  if (!reviewIdExists) {
+    return Promise.reject({
+      status: 404,
+      message: `Review id ${review_id} not found`,
+    });
+  }
+
+  const usernameExists = await checkExists("users", "username", username);
+  if (!usernameExists) {
+    return Promise.reject({
+      status: 404,
+      message: `Username "${username}" not found in users table`,
+    });
+  }
+
+  if (body.length > 1000) {
+    return Promise.reject({
+      status: 400,
+      message: "Body text exceeds 1000 characters",
+    });
+  }
+
   const queryString = `
         INSERT INTO comments
             (author, review_id, body)
@@ -150,9 +184,11 @@ exports.insertNewComment = async ({ newComment, review_id }) => {
   const queryValues = [username, review_id, body];
 
   const { rows } = await db.query(queryString, queryValues);
+
   return rows;
 };
 
+// reusable checkExists function
 const checkExists = async (table, column, value) => {
   const queryStr = format("SELECT * FROM %I WHERE %I = $1;", table, column);
   const dbOutput = await db.query(queryStr, [value]);
