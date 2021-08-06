@@ -160,8 +160,8 @@ describe("/api/reviews", () => {
   describe("GET", () => {
     test("200: responds with array of objects with the correct properties", async () => {
       const res = await request(app).get("/api/reviews").expect(200);
-      expect(Array.isArray(res.body.reviews)).toBe(true);
-      res.body.reviews.forEach((review) => {
+      expect(Array.isArray(res.body.result.reviews)).toBe(true);
+      res.body.result.reviews.forEach((review) => {
         expect(review).toHaveProperty("owner");
         expect(review).toHaveProperty("title");
         expect(review).toHaveProperty("category");
@@ -174,13 +174,13 @@ describe("/api/reviews", () => {
       const res = await request(app)
         .get("/api/reviews?sort_by=review_id")
         .expect(200);
-      expect(Array.isArray(res.body.reviews)).toBe(true);
-      expect(res.body.reviews).toBeSortedBy("review_id");
+      expect(Array.isArray(res.body.result.reviews)).toBe(true);
+      expect(res.body.result.reviews).toBeSortedBy("review_id");
     });
     test("200: responds with array of objects sorted by date (created_at) by default", async () => {
       const res = await request(app).get("/api/reviews").expect(200);
-      expect(Array.isArray(res.body.reviews)).toBe(true);
-      expect(res.body.reviews).toBeSortedBy("created_at");
+      expect(Array.isArray(res.body.result.reviews)).toBe(true);
+      expect(res.body.result.reviews).toBeSortedBy("created_at");
     });
     test("400: responds with a message when attempting to sort by an invalid column", async () => {
       const res = await request(app)
@@ -194,15 +194,19 @@ describe("/api/reviews", () => {
       const res = await request(app)
         .get("/api/reviews?sort_by=votes")
         .expect(200);
-      expect(Array.isArray(res.body.reviews)).toBe(true);
-      expect(res.body.reviews).toBeSortedBy("votes", { descending: false });
+      expect(Array.isArray(res.body.result.reviews)).toBe(true);
+      expect(res.body.result.reviews).toBeSortedBy("votes", {
+        descending: false,
+      });
     });
     test("200: responds with array of objects sorted by votes in descending order", async () => {
       const res = await request(app)
         .get("/api/reviews?sort_by=votes&order=desc")
         .expect(200);
-      expect(Array.isArray(res.body.reviews)).toBe(true);
-      expect(res.body.reviews).toBeSortedBy("votes", { descending: true });
+      expect(Array.isArray(res.body.result.reviews)).toBe(true);
+      expect(res.body.result.reviews).toBeSortedBy("votes", {
+        descending: true,
+      });
     });
     test("400: responds with a message when attempting to order by an invalid value", async () => {
       const res = await request(app)
@@ -216,8 +220,8 @@ describe("/api/reviews", () => {
       const res = await request(app)
         .get("/api/reviews?category=dexterity")
         .expect(200);
-      expect(Array.isArray(res.body.reviews)).toBe(true);
-      res.body.reviews.forEach((review) => {
+      expect(Array.isArray(res.body.result.reviews)).toBe(true);
+      res.body.result.reviews.forEach((review) => {
         expect(review).toHaveProperty("owner");
         expect(review).toHaveProperty("title");
         expect(review).toHaveProperty("category");
@@ -241,32 +245,40 @@ describe("/api/reviews", () => {
       const res = await request(app)
         .get("/api/reviews?category=children's+games")
         .expect(200);
-      expect(Array.isArray(res.body.reviews)).toBe(true);
-      expect(res.body.reviews.length).toBe(0);
+      expect(Array.isArray(res.body.result.reviews)).toBe(true);
+      expect(res.body.result.reviews.length).toBe(0);
     });
     test("200: returns the number of reviews with default limit value of 10 and defaults to page 1", async () => {
       const res = await request(app).get("/api/reviews").expect(200);
-      expect(res.body.reviews).toHaveLength(10);
+      expect(res.body.result.reviews).toHaveLength(10);
     });
     test("200: returns the number of reviews with limit of 3 and on page 2", async () => {
       const res = await request(app)
         .get("/api/reviews?page=2&limit=3&sort_by=review_id")
         .expect(200);
-      expect(res.body.reviews).toHaveLength(3);
-      expect(res.body.reviews[0].review_id).toBe(4);
-      expect(res.body.reviews[1].review_id).toBe(5);
-      expect(res.body.reviews[2].review_id).toBe(6);
+      expect(res.body.result.reviews).toHaveLength(3);
+      expect(res.body.result.reviews[0].review_id).toBe(4);
+      expect(res.body.result.reviews[1].review_id).toBe(5);
+      expect(res.body.result.reviews[2].review_id).toBe(6);
     });
     test("200: returns the number of reviews with limit of 5 and no page specified (default on page 1)", async () => {
       const res = await request(app)
         .get("/api/reviews?limit=5&sort_by=review_id")
         .expect(200);
-      expect(res.body.reviews).toHaveLength(5);
-      expect(res.body.reviews[0].review_id).toBe(1);
-      expect(res.body.reviews[1].review_id).toBe(2);
-      expect(res.body.reviews[2].review_id).toBe(3);
-      expect(res.body.reviews[3].review_id).toBe(4);
-      expect(res.body.reviews[4].review_id).toBe(5);
+      expect(res.body.result.reviews).toHaveLength(5);
+      expect(res.body.result.reviews[0].review_id).toBe(1);
+      expect(res.body.result.reviews[1].review_id).toBe(2);
+      expect(res.body.result.reviews[2].review_id).toBe(3);
+      expect(res.body.result.reviews[3].review_id).toBe(4);
+      expect(res.body.result.reviews[4].review_id).toBe(5);
+    });
+    test("200: returns the number of reviews with limit of 3 and on page 2, with a total_count property", async () => {
+      const res = await request(app)
+        .get("/api/reviews?limit=3&sort_by=review_id&category=social+deduction")
+        .expect(200);
+      expect(res.body.result).toHaveProperty("reviews");
+      expect(res.body.result).toHaveProperty("total_count");
+      expect(res.body.result.total_count).toBe(11);
     });
   });
 });

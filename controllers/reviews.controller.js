@@ -34,8 +34,8 @@ exports.updateReviewById = (req, res, next) => {
 exports.getReviews = (req, res, next) => {
   const query = req.query;
   fetchReviews(query)
-    .then((reviews) => {
-      res.status(200).send({ reviews });
+    .then((result) => {
+      res.status(200).send({ result });
     })
     .catch((err) => {
       next(err);

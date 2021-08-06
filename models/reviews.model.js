@@ -108,14 +108,24 @@ exports.fetchReviews = async (query) => {
     queryValues.push(category);
     queryString += "WHERE category = $3 ";
   }
-  let queryStringEnd = `
+  const queryStringEnd = `
         GROUP BY reviews.review_id
-        ORDER BY ${sort_by} ${order.toUpperCase()}
-        LIMIT $1 OFFSET $2;`;
+        ORDER BY ${sort_by} ${order.toUpperCase()}`;
+  const queryLimitPage = ` LIMIT $1 OFFSET $2;`;
 
-  const { rows } = await db.query(queryString + queryStringEnd, queryValues);
+  const fullQueryString = queryString + queryStringEnd + queryLimitPage;
 
-  if (rows.length === 0) {
+  const { rows } = await db.query(fullQueryString, queryValues);
+
+  let totalCountQuery = fullQueryString.replace(queryLimitPage, ";");
+  totalCountQuery = totalCountQuery.replace("$3", "$1");
+  queryValues.shift();
+  queryValues.shift();
+
+  const totalCountDbQuery = await db.query(totalCountQuery, queryValues);
+  const totalCount = totalCountDbQuery.rows.length;
+
+  if (rows.length === 0 && totalCount === 0) {
     const categoryExists = await checkExists("categories", "slug", category);
     if (!categoryExists) {
       return Promise.reject({
@@ -124,7 +134,8 @@ exports.fetchReviews = async (query) => {
       });
     }
   }
-  return rows;
+
+  return { reviews: rows, total_count: totalCount };
 };
 
 exports.fetchReviewCommentsById = async ({ review_id }) => {
