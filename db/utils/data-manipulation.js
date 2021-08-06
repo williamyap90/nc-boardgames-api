@@ -1,7 +1,7 @@
 exports.formatData = (data) => {
   let result = [];
 
-  data.map((item) => {
+  data.forEach((item) => {
     let tempArray = [];
     for (let key in item) {
       tempArray.push(item[key]);
