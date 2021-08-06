@@ -28,9 +28,9 @@ describe("/api/categories", () => {
   describe("GET", () => {
     test("200: responds with an array of categories", async () => {
       const res = await request(app).get("/api/categories").expect(200);
-      expect(Array.isArray(res.body)).toBe(true);
-      expect(res.body).toHaveLength(4);
-      res.body.forEach((category) => {
+      expect(Array.isArray(res.body.result)).toBe(true);
+      expect(res.body.result).toHaveLength(4);
+      res.body.result.forEach((category) => {
         expect(category).toHaveProperty("slug");
         expect(category).toHaveProperty("description");
       });
@@ -42,12 +42,12 @@ describe("/api/reviews/:review_id", () => {
   describe("GET", () => {
     test("200: responds with an array of the specified review_id", async () => {
       const res = await request(app).get("/api/reviews/2").expect(200);
-      expect(Array.isArray(res.body)).toBe(true);
-      expect(res.body).toHaveLength(1);
+      expect(Array.isArray(res.body.review)).toBe(true);
+      expect(res.body.review).toHaveLength(1);
     });
     test("200: responds with an array of the specified review_id in the correct format", async () => {
       const res = await request(app).get("/api/reviews/2").expect(200);
-      res.body.forEach((review) => {
+      res.body.review.forEach((review) => {
         expect(review).toHaveProperty("owner");
         expect(review).toHaveProperty("title");
         expect(review).toHaveProperty("review_id");
@@ -78,8 +78,8 @@ describe("/api/reviews/:review_id", () => {
         .patch("/api/reviews/2")
         .send(updateVotes)
         .expect(201);
-      expect(res.body[0].votes).toEqual(8);
-      res.body.forEach((review) => {
+      expect(res.body.review[0].votes).toEqual(8);
+      res.body.review.forEach((review) => {
         expect(review).toHaveProperty("owner");
         expect(review).toHaveProperty("title");
         expect(review).toHaveProperty("review_id");
@@ -97,7 +97,7 @@ describe("/api/reviews/:review_id", () => {
         .patch("/api/reviews/8")
         .send(updateVotes)
         .expect(201);
-      expect(res.body[0].votes).toEqual(0);
+      expect(res.body.review[0].votes).toEqual(0);
     });
     test("201: responds with the updated object for specified review_id, with a vote of zero to avoid negative values", async () => {
       const updateVotes = { inc_votes: -100 };
@@ -105,7 +105,7 @@ describe("/api/reviews/:review_id", () => {
         .patch("/api/reviews/2")
         .send(updateVotes)
         .expect(201);
-      expect(res.body[0].votes).toEqual(0);
+      expect(res.body.review[0].votes).toEqual(0);
     });
     test("400: responds with a message for invalid review_id ", async () => {
       const updateVotes = { inc_votes: 3 };
@@ -158,9 +158,9 @@ describe("/api/reviews", () => {
   describe("GET", () => {
     test("200: responds with array of objects with the correct properties", async () => {
       const res = await request(app).get("/api/reviews").expect(200);
-      expect(Array.isArray(res.body)).toBe(true);
-      expect(res.body.length).toBe(13);
-      res.body.forEach((review) => {
+      expect(Array.isArray(res.body.reviews)).toBe(true);
+      expect(res.body.reviews.length).toBe(13);
+      res.body.reviews.forEach((review) => {
         expect(review).toHaveProperty("owner");
         expect(review).toHaveProperty("title");
         expect(review).toHaveProperty("category");
@@ -173,15 +173,15 @@ describe("/api/reviews", () => {
       const res = await request(app)
         .get("/api/reviews?sort_by=review_id")
         .expect(200);
-      expect(Array.isArray(res.body)).toBe(true);
-      expect(res.body.length).toBe(13);
-      expect(res.body).toBeSortedBy("review_id");
+      expect(Array.isArray(res.body.reviews)).toBe(true);
+      expect(res.body.reviews.length).toBe(13);
+      expect(res.body.reviews).toBeSortedBy("review_id");
     });
     test("200: responds with array of objects sorted by date (created_at) by default", async () => {
       const res = await request(app).get("/api/reviews").expect(200);
-      expect(Array.isArray(res.body)).toBe(true);
-      expect(res.body.length).toBe(13);
-      expect(res.body).toBeSortedBy("created_at");
+      expect(Array.isArray(res.body.reviews)).toBe(true);
+      expect(res.body.reviews.length).toBe(13);
+      expect(res.body.reviews).toBeSortedBy("created_at");
     });
     test("400: responds with a message when attempting to sort by an invalid column", async () => {
       const res = await request(app)
@@ -195,17 +195,17 @@ describe("/api/reviews", () => {
       const res = await request(app)
         .get("/api/reviews?sort_by=votes")
         .expect(200);
-      expect(Array.isArray(res.body)).toBe(true);
-      expect(res.body.length).toBe(13);
-      expect(res.body).toBeSortedBy("votes", { descending: false });
+      expect(Array.isArray(res.body.reviews)).toBe(true);
+      expect(res.body.reviews.length).toBe(13);
+      expect(res.body.reviews).toBeSortedBy("votes", { descending: false });
     });
     test("200: responds with array of objects sorted by votes in descending order", async () => {
       const res = await request(app)
         .get("/api/reviews?sort_by=votes&order=desc")
         .expect(200);
-      expect(Array.isArray(res.body)).toBe(true);
-      expect(res.body.length).toBe(13);
-      expect(res.body).toBeSortedBy("votes", { descending: true });
+      expect(Array.isArray(res.body.reviews)).toBe(true);
+      expect(res.body.reviews.length).toBe(13);
+      expect(res.body.reviews).toBeSortedBy("votes", { descending: true });
     });
     test("400: responds with a message when attempting to order by an invalid value", async () => {
       const res = await request(app)
@@ -219,8 +219,8 @@ describe("/api/reviews", () => {
       const res = await request(app)
         .get("/api/reviews?category=dexterity")
         .expect(200);
-      expect(Array.isArray(res.body)).toBe(true);
-      res.body.forEach((review) => {
+      expect(Array.isArray(res.body.reviews)).toBe(true);
+      res.body.reviews.forEach((review) => {
         expect(review).toHaveProperty("owner");
         expect(review).toHaveProperty("title");
         expect(review).toHaveProperty("category");
@@ -244,8 +244,8 @@ describe("/api/reviews", () => {
       const res = await request(app)
         .get("/api/reviews?category=children's+games")
         .expect(200);
-      expect(Array.isArray(res.body)).toBe(true);
-      expect(res.body.length).toBe(0);
+      expect(Array.isArray(res.body.reviews)).toBe(true);
+      expect(res.body.reviews.length).toBe(0);
     });
   });
 });
@@ -254,9 +254,9 @@ describe("/api/reviews/:review_id/comments", () => {
   describe("GET", () => {
     test("200: responds with an array of comments for the given review_id", async () => {
       const res = await request(app).get("/api/reviews/2/comments").expect(200);
-      expect(Array.isArray(res.body)).toBe(true);
-      expect(res.body.length).toBe(3);
-      res.body.forEach((comment) => {
+      expect(Array.isArray(res.body.comment)).toBe(true);
+      expect(res.body.comment.length).toBe(3);
+      res.body.comment.forEach((comment) => {
         expect(comment).toHaveProperty("comment_id");
         expect(comment).toHaveProperty("votes");
         expect(comment).toHaveProperty("created_at");
@@ -290,8 +290,8 @@ describe("/api/reviews/:review_id/comments", () => {
         .post("/api/reviews/2/comments")
         .send(postBody)
         .expect(201);
-      expect(res.body.length).toBe(1);
-      res.body.forEach((comment) => {
+      expect(res.body.comment.length).toBe(1);
+      res.body.comment.forEach((comment) => {
         expect(comment).toHaveProperty("review_id");
         expect(comment.review_id).toBe(2);
         expect(comment).toHaveProperty("comment_id");
@@ -383,8 +383,8 @@ describe("/api/users", () => {
   describe("GET", () => {
     test("200: responds with an array of users", async () => {
       const res = await request(app).get("/api/users").expect(200);
-      expect(Array.isArray(res.body)).toBe(true);
-      res.body.forEach((user) => {
+      expect(Array.isArray(res.body.users)).toBe(true);
+      res.body.users.forEach((user) => {
         expect(user).toHaveProperty("username");
         expect(user).toHaveProperty("avatar_url");
         expect(user).toHaveProperty("name");
