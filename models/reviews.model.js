@@ -163,7 +163,7 @@ exports.insertNewComment = async ({ newComment, review_id }) => {
   if (!usernameExists) {
     return Promise.reject({
       status: 404,
-      message: `Username "${username}" not found in users table`,
+      message: `Username "${username}" does not exist`,
     });
   }
 
