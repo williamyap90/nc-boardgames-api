@@ -350,6 +350,7 @@ describe("/api/reviews/:review_id/comments", () => {
   });
 });
 
+// update endpoints below to JSON object at /api
 describe("/api/comments/:comment_id", () => {
   describe("DELETE", () => {
     test("204: responds with no content, delete the given comment by comment_id", async () => {
@@ -357,5 +358,39 @@ describe("/api/comments/:comment_id", () => {
       const dbCheck = await db.query("SELECT * FROM comments;");
       expect(dbCheck.rows).toHaveLength(5);
     });
+    test("400: responds with error when attempting to delete an invalid id type", async () => {
+      const res = await request(app)
+        .delete("/api/comments/notACommentId")
+        .expect(400);
+      expect(res.body.message).toBe(
+        'invalid input syntax for type integer: "notACommentId"'
+      );
+    });
+    test("404: respond with an error when attempting to delete a comment_id that is valid but does not exist", async () => {
+      const res = await request(app).delete("/api/comments/99999").expect(404);
+      expect(res.text).toBe(
+        'Comment id "99999" not found in the comments table'
+      );
+    });
   });
 });
+
+/* 
+GET api/users
+200: responds with a array of users
+
+GET api/users/:username
+200: responds with array of single user of specified username
+400: responds with error for invalid username
+404: responds with error username not found
+
+PATCH api/comments/:comment_id
+201: responds with updated object with increased votes
+201: responds with updated object with decreased votes
+201: responds with updated object with minimum vote as zero to avoid negative values
+400: responds with message for invalid review_id
+404: responds with not found for valid but non-existent review_id
+400: responds with a message for no inc_votes on request body
+400: responds with a message when invalid properties present in request body
+
+*/
