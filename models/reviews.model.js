@@ -199,3 +199,5 @@ const checkExists = async (table, column, value) => {
     return true;
   }
 };
+
+// create reusable functions for Promise.reject with same messages and refactor code
