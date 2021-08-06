@@ -1,3 +1,5 @@
 node_modules
 .env.*
 query.txt
+tables-test.txt
+tables-dev.txt
