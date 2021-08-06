@@ -1,5 +1,6 @@
 const db = require("../db/connection");
 const format = require("pg-format");
+const { checkExists } = require("../helpers");
 
 exports.fetchReviewById = async ({ review_id }) => {
   const queryValue = [review_id];
@@ -187,17 +188,3 @@ exports.insertNewComment = async ({ newComment, review_id }) => {
 
   return rows;
 };
-
-// reusable checkExists function
-const checkExists = async (table, column, value) => {
-  const queryStr = format("SELECT * FROM %I WHERE %I = $1;", table, column);
-  const dbOutput = await db.query(queryStr, [value]);
-
-  if (dbOutput.rows.length === 0) {
-    return false;
-  } else {
-    return true;
-  }
-};
-
-// create reusable functions for Promise.reject with same messages and refactor code
