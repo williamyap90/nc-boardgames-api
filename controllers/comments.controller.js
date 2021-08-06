@@ -19,7 +19,7 @@ exports.updateCommentById = (req, res, next) => {
   const updateVotes = req.body;
   patchCommentById({ comment_id, updateVotes })
     .then((comment) => {
-      res.status(201).send({ comment });
+      res.status(200).send({ comment });
     })
     .catch((err) => {
       next(err);
