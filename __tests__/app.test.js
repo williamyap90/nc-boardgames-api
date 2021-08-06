@@ -74,12 +74,12 @@ describe("/api/reviews/:review_id", () => {
     });
   });
   describe("PATCH", () => {
-    test("201: responds with the updated object for specified review_id when increasing votes", async () => {
+    test("200: responds with the updated object for specified review_id when increasing votes", async () => {
       const updateVotes = { inc_votes: 3 };
       const res = await request(app)
         .patch("/api/reviews/2")
         .send(updateVotes)
-        .expect(201);
+        .expect(200);
       expect(res.body.review[0].votes).toEqual(8);
       res.body.review.forEach((review) => {
         expect(review).toHaveProperty("owner");
@@ -93,20 +93,20 @@ describe("/api/reviews/:review_id", () => {
         expect(review).toHaveProperty("votes");
       });
     });
-    test("201: responds with the updated object for specified review_id when decreasing votes", async () => {
+    test("200: responds with the updated object for specified review_id when decreasing votes", async () => {
       const updateVotes = { inc_votes: -100 };
       const res = await request(app)
         .patch("/api/reviews/8")
         .send(updateVotes)
-        .expect(201);
+        .expect(200);
       expect(res.body.review[0].votes).toEqual(0);
     });
-    test("201: responds with the updated object for specified review_id, with a vote of zero to avoid negative values", async () => {
+    test("200: responds with the updated object for specified review_id, with a vote of zero to avoid negative values", async () => {
       const updateVotes = { inc_votes: -100 };
       const res = await request(app)
         .patch("/api/reviews/2")
         .send(updateVotes)
-        .expect(201);
+        .expect(200);
       expect(res.body.review[0].votes).toEqual(0);
     });
     test("400: responds with a message for invalid review_id ", async () => {
@@ -161,7 +161,6 @@ describe("/api/reviews", () => {
     test("200: responds with array of objects with the correct properties", async () => {
       const res = await request(app).get("/api/reviews").expect(200);
       expect(Array.isArray(res.body.reviews)).toBe(true);
-      expect(res.body.reviews.length).toBe(13);
       res.body.reviews.forEach((review) => {
         expect(review).toHaveProperty("owner");
         expect(review).toHaveProperty("title");
@@ -176,13 +175,11 @@ describe("/api/reviews", () => {
         .get("/api/reviews?sort_by=review_id")
         .expect(200);
       expect(Array.isArray(res.body.reviews)).toBe(true);
-      expect(res.body.reviews.length).toBe(13);
       expect(res.body.reviews).toBeSortedBy("review_id");
     });
     test("200: responds with array of objects sorted by date (created_at) by default", async () => {
       const res = await request(app).get("/api/reviews").expect(200);
       expect(Array.isArray(res.body.reviews)).toBe(true);
-      expect(res.body.reviews.length).toBe(13);
       expect(res.body.reviews).toBeSortedBy("created_at");
     });
     test("400: responds with a message when attempting to sort by an invalid column", async () => {
@@ -198,7 +195,6 @@ describe("/api/reviews", () => {
         .get("/api/reviews?sort_by=votes")
         .expect(200);
       expect(Array.isArray(res.body.reviews)).toBe(true);
-      expect(res.body.reviews.length).toBe(13);
       expect(res.body.reviews).toBeSortedBy("votes", { descending: false });
     });
     test("200: responds with array of objects sorted by votes in descending order", async () => {
@@ -206,7 +202,6 @@ describe("/api/reviews", () => {
         .get("/api/reviews?sort_by=votes&order=desc")
         .expect(200);
       expect(Array.isArray(res.body.reviews)).toBe(true);
-      expect(res.body.reviews.length).toBe(13);
       expect(res.body.reviews).toBeSortedBy("votes", { descending: true });
     });
     test("400: responds with a message when attempting to order by an invalid value", async () => {
@@ -248,6 +243,30 @@ describe("/api/reviews", () => {
         .expect(200);
       expect(Array.isArray(res.body.reviews)).toBe(true);
       expect(res.body.reviews.length).toBe(0);
+    });
+    test("200: returns the number of reviews with default limit value of 10 and defaults to page 1", async () => {
+      const res = await request(app).get("/api/reviews").expect(200);
+      expect(res.body.reviews).toHaveLength(10);
+    });
+    test("200: returns the number of reviews with limit of 3 and on page 2", async () => {
+      const res = await request(app)
+        .get("/api/reviews?page=2&limit=3&sort_by=review_id")
+        .expect(200);
+      expect(res.body.reviews).toHaveLength(3);
+      expect(res.body.reviews[0].review_id).toBe(4);
+      expect(res.body.reviews[1].review_id).toBe(5);
+      expect(res.body.reviews[2].review_id).toBe(6);
+    });
+    test("200: returns the number of reviews with limit of 5 and no page specified (default on page 1)", async () => {
+      const res = await request(app)
+        .get("/api/reviews?limit=5&sort_by=review_id")
+        .expect(200);
+      expect(res.body.reviews).toHaveLength(5);
+      expect(res.body.reviews[0].review_id).toBe(1);
+      expect(res.body.reviews[1].review_id).toBe(2);
+      expect(res.body.reviews[2].review_id).toBe(3);
+      expect(res.body.reviews[3].review_id).toBe(4);
+      expect(res.body.reviews[4].review_id).toBe(5);
     });
   });
 });
@@ -378,12 +397,12 @@ describe("/api/comments/:comment_id", () => {
     });
   });
   describe("PATCH", () => {
-    test("201: responds with updated object with increased votes ", async () => {
+    test("200: responds with updated object with increased votes ", async () => {
       const updateVotes = { inc_votes: 3 };
       const res = await request(app)
         .patch("/api/comments/2")
         .send(updateVotes)
-        .expect(201);
+        .expect(200);
       res.body.comment.forEach((comment) => {
         expect(comment).toHaveProperty("comment_id");
         expect(comment).toHaveProperty("author");
@@ -396,12 +415,12 @@ describe("/api/comments/:comment_id", () => {
         expect(comment.votes).toBe(16);
       });
     });
-    test("201: responds with updated object with decreased votes ", async () => {
+    test("200: responds with updated object with decreased votes ", async () => {
       const updateVotes = { inc_votes: -50 };
       const res = await request(app)
         .patch("/api/comments/2")
         .send(updateVotes)
-        .expect(201);
+        .expect(200);
       res.body.comment.forEach((comment) => {
         expect(comment).toHaveProperty("comment_id");
         expect(comment).toHaveProperty("author");

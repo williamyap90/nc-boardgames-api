@@ -64,7 +64,13 @@ exports.patchReviewById = async ({ updateBody, review_id }) => {
 };
 
 exports.fetchReviews = async (query) => {
-  const { sort_by = "created_at", order = "asc", category } = query;
+  const {
+    sort_by = "created_at",
+    order = "asc",
+    category,
+    limit = 10,
+    page = 1,
+  } = query;
 
   const validColumns = [
     "owner",
@@ -91,19 +97,21 @@ exports.fetchReviews = async (query) => {
     });
   }
 
-  const queryValues = [];
+  const offset = (page - 1) * limit;
 
+  const queryValues = [limit, offset];
   let queryString = `
         SELECT reviews.owner, title, reviews.review_id, category, review_img_url, reviews.created_at, reviews.votes, COUNT(comment_id) AS comment_count
         FROM reviews 
         LEFT JOIN comments ON reviews.review_id = comments.review_id `;
   if (category) {
     queryValues.push(category);
-    queryString += "WHERE category = $1 ";
+    queryString += "WHERE category = $3 ";
   }
   let queryStringEnd = `
         GROUP BY reviews.review_id
-        ORDER BY ${sort_by} ${order.toUpperCase()};`;
+        ORDER BY ${sort_by} ${order.toUpperCase()}
+        LIMIT $1 OFFSET $2;`;
 
   const { rows } = await db.query(queryString + queryStringEnd, queryValues);
 
