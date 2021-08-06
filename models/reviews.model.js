@@ -1,5 +1,4 @@
 const db = require("../db/connection");
-const format = require("pg-format");
 const { checkExists } = require("../helpers");
 
 exports.fetchReviewById = async ({ review_id }) => {
