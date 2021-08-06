@@ -1,4 +1,6 @@
 exports.formatData = (data) => {
+  if (data.length === 0) return [];
+
   let result = [];
 
   data.forEach((item) => {

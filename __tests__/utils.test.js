@@ -5,6 +5,10 @@ const {
 } = require("../db/utils/data-manipulation.js");
 
 describe("formatData(userData)", () => {
+  it("Returns an empty array when provided an empty array ", () => {
+    const test = [];
+    expect(formatData(test)).toEqual([]);
+  });
   it("Returns a new array", () => {
     const test = formatData([
       {
