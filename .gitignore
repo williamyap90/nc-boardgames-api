@@ -3,3 +3,4 @@ node_modules
 query.txt
 tables-test.txt
 tables-dev.txt
+query.sql
