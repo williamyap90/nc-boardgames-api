@@ -30,6 +30,10 @@ describe("/api/categories", () => {
       const res = await request(app).get("/api/categories").expect(200);
       expect(Array.isArray(res.body)).toBe(true);
       expect(res.body).toHaveLength(4);
+      res.body.forEach((category) => {
+        expect(category).toHaveProperty("slug");
+        expect(category).toHaveProperty("description");
+      });
     });
   });
 });
@@ -375,10 +379,21 @@ describe("/api/comments/:comment_id", () => {
   });
 });
 
-/* 
-GET api/users
-200: responds with a array of users
+describe("/api/users", () => {
+  describe("GET", () => {
+    test("200: responds with an array of users", async () => {
+      const res = await request(app).get("/api/users").expect(200);
+      expect(Array.isArray(res.body)).toBe(true);
+      res.body.forEach((user) => {
+        expect(user).toHaveProperty("username");
+        expect(user).toHaveProperty("avatar_url");
+        expect(user).toHaveProperty("name");
+      });
+    });
+  });
+});
 
+/* 
 GET api/users/:username
 200: responds with array of single user of specified username
 400: responds with error for invalid username
