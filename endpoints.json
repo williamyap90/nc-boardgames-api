@@ -70,36 +70,6 @@
       ]
     }
   },
-  "GET /api/reviews": {
-    "description": "serves an array of the reviews sorted by any queries",
-    "sortQueries": [
-      "owner",
-      "title",
-      "review_id",
-      "category",
-      "review_img_url",
-      "created_at",
-      "votes",
-      "comment_id"
-    ],
-    "orderQueries": ["asc", "desc"],
-    "otherFilters": "by category",
-    "exampleResponse": {
-      "reviews": [
-        {
-          "review_id": 2,
-          "title": "Jenga",
-          "review_body": "Fiddly fun for all the family",
-          "designer": "Leslie Scott",
-          "review_img_url": "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png",
-          "votes": 8,
-          "category": "dexterity",
-          "owner": "philippaclaire9",
-          "created_at": "2021-01-18T10:01:41.251Z"
-        }
-      ]
-    }
-  },
   "GET /api/reviews/:review_id/comments": {
     "description": "serves an array of comments on reviews for the specified review_id",
     "queries": [],
@@ -131,6 +101,59 @@
           "votes": 0,
           "created_at": "2021-08-05T15:54:04.330Z",
           "body": "Thoroughly enjoyed this game!"
+        }
+      ]
+    }
+  },
+  "DELETE /api/comments/:comment_id": {
+    "description": "deletes the comment for the specified comment_id",
+    "queries": [],
+    "response": "204 no content"
+  },
+  "PATCH /api/comments/:comment_id": {
+    "description": "serves an array containing the specified comment_id with updated votes",
+    "queries": [],
+    "exampleBody": { "inc_votes": 3 },
+    "exampleResponse": {
+      "comment": [
+        {
+          "comment_id": 2,
+          "author": "mallionaire",
+          "review_id": 3,
+          "votes": 16,
+          "created_at": "2021-01-18T10:09:05.410Z",
+          "body": "My dog loved this game too!"
+        }
+      ]
+    }
+  },
+  "GET /api/users": {
+    "description": "serves an array of all users",
+    "queries": [],
+    "exampleResponse": {
+      "users": [
+        {
+          "username": "mallionaire",
+          "avatar_url": "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg",
+          "name": "haz"
+        },
+        {
+          "username": "philippaclaire9",
+          "avatar_url": "https://avatars2.githubusercontent.com/u/24604688?s=460&v=4",
+          "name": "philippa"
+        }
+      ]
+    }
+  },
+  "GET /api/users/:username": {
+    "description": "serves an array a single user of the specified username",
+    "queries": [],
+    "exampleResponse": {
+      "users": [
+        {
+          "username": "philippaclaire9",
+          "avatar_url": "https://avatars2.githubusercontent.com/u/24604688?s=460&v=4",
+          "name": "philippa"
         }
       ]
     }
