@@ -287,9 +287,9 @@ describe("/api/reviews/:review_id/comments", () => {
   describe("GET", () => {
     test("200: responds with an array of comments for the given review_id", async () => {
       const res = await request(app).get("/api/reviews/2/comments").expect(200);
-      expect(Array.isArray(res.body.comment)).toBe(true);
-      expect(res.body.comment.length).toBe(3);
-      res.body.comment.forEach((comment) => {
+      expect(Array.isArray(res.body.comments)).toBe(true);
+      expect(res.body.comments.length).toBe(3);
+      res.body.comments.forEach((comment) => {
         expect(comment).toHaveProperty("comment_id");
         expect(comment).toHaveProperty("votes");
         expect(comment).toHaveProperty("created_at");
@@ -310,6 +310,21 @@ describe("/api/reviews/:review_id/comments", () => {
         .get("/api/reviews/99999/comments")
         .expect(404);
       expect(res.text).toBe("Review id 99999 not found");
+    });
+    test("200: returns the number of comments with limit of 2, default to page 1", async () => {
+      const res = await request(app)
+        .get("/api/reviews/3/comments?limit=2")
+        .expect(200);
+      expect(res.body.comments).toHaveLength(2);
+      expect(res.body.comments[0].comment_id).toBe(2);
+      expect(res.body.comments[1].comment_id).toBe(3);
+    });
+    test("200: returns the number of comments with limit of 1, page 3", async () => {
+      const res = await request(app)
+        .get("/api/reviews/3/comments?limit=1&page=3")
+        .expect(200);
+      expect(res.body.comments).toHaveLength(1);
+      expect(res.body.comments[0].comment_id).toBe(6);
     });
   });
 
@@ -385,7 +400,6 @@ describe("/api/reviews/:review_id/comments", () => {
   });
 });
 
-// update endpoints below to JSON object at /api
 describe("/api/comments/:comment_id", () => {
   describe("DELETE", () => {
     test("204: responds with no content, delete the given comment by comment_id", async () => {

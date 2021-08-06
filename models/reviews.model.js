@@ -138,14 +138,19 @@ exports.fetchReviews = async (query) => {
   return { reviews: rows, total_count: totalCount };
 };
 
-exports.fetchReviewCommentsById = async ({ review_id }) => {
+exports.fetchReviewCommentsById = async ({ review_id, query }) => {
+  const { limit = 10, page = 1 } = query;
+
+  const offset = (page - 1) * limit;
+  const queryValues = [review_id, limit, offset];
+
   let queryString = `
         SELECT comment_id, votes, created_at, author, body FROM comments
         WHERE review_id = $1
     `;
-  const queryValues = [review_id];
+  const queryLimitPage = ` LIMIT $2 OFFSET $3;`;
 
-  const { rows } = await db.query(queryString, queryValues);
+  const { rows } = await db.query(queryString + queryLimitPage, queryValues);
 
   if (rows.length === 0) {
     return Promise.reject({
