@@ -3,6 +3,7 @@ const testData = require("../db/data/test-data/index.js");
 const seed = require("../db/seeds/seed.js");
 const request = require("supertest");
 const app = require("../app.js");
+const endpointsJSON = require("../endpoints.json");
 
 beforeEach(() => seed(testData));
 afterAll(() => db.end());
@@ -20,6 +21,7 @@ describe("/api", () => {
     test("200: responds with a JSON object of all the available endpoints on the server", async () => {
       const res = await request(app).get("/api").expect(200);
       expect(typeof res.body).toBe("object");
+      expect(res.body.endpoints).toEqual(endpointsJSON);
     });
   });
 });
@@ -336,9 +338,7 @@ describe("/api/reviews/:review_id/comments", () => {
         .post("/api/reviews/2/comments")
         .send(postBody)
         .expect(404);
-      expect(res.text).toBe(
-        'Username "williamyap0101" not found in users table'
-      );
+      expect(res.text).toBe('Username "williamyap0101" does not exist');
     });
     test("400: responds with an error message when attempting to send post request with body character length longer than VARCHAR(1000)", async () => {
       const postBody = {
@@ -377,6 +377,88 @@ describe("/api/comments/:comment_id", () => {
       );
     });
   });
+  describe("PATCH", () => {
+    test("201: responds with updated object with increased votes ", async () => {
+      const updateVotes = { inc_votes: 3 };
+      const res = await request(app)
+        .patch("/api/comments/2")
+        .send(updateVotes)
+        .expect(201);
+      res.body.comment.forEach((comment) => {
+        expect(comment).toHaveProperty("comment_id");
+        expect(comment).toHaveProperty("author");
+        expect(comment).toHaveProperty("review_id");
+        expect(comment).toHaveProperty("votes");
+        expect(comment).toHaveProperty("created_at");
+        expect(comment).toHaveProperty("body");
+        expect(comment.author).toBe("mallionaire");
+        expect(comment.review_id).toBe(3);
+        expect(comment.votes).toBe(16);
+      });
+    });
+    test("201: responds with updated object with decreased votes ", async () => {
+      const updateVotes = { inc_votes: -50 };
+      const res = await request(app)
+        .patch("/api/comments/2")
+        .send(updateVotes)
+        .expect(201);
+      res.body.comment.forEach((comment) => {
+        expect(comment).toHaveProperty("comment_id");
+        expect(comment).toHaveProperty("author");
+        expect(comment).toHaveProperty("review_id");
+        expect(comment).toHaveProperty("votes");
+        expect(comment).toHaveProperty("created_at");
+        expect(comment).toHaveProperty("body");
+        expect(comment.author).toBe("mallionaire");
+        expect(comment.review_id).toBe(3);
+        expect(comment.votes).toBe(-37);
+      });
+    });
+    test("400: responds with a message for invalid comment_id", async () => {
+      const updateVotes = { inc_votes: 5 };
+      const res = await request(app)
+        .patch("/api/comments/notAnId")
+        .send(updateVotes)
+        .expect(400);
+      expect(res.body.message).toBe(
+        'invalid input syntax for type integer: "notAnId"'
+      );
+    });
+    test("404: responds with a not found for valid but non-existent comment_id", async () => {
+      const updateVotes = { inc_votes: 5 };
+      const res = await request(app)
+        .patch("/api/comments/99999")
+        .send(updateVotes)
+        .expect(404);
+      expect(res.text).toBe('Comment id "99999" not found');
+    });
+    test("400: responds with a message for no inc_votes on request body", async () => {
+      const updateVotes = {};
+      const res = await request(app)
+        .patch("/api/comments/2")
+        .send(updateVotes)
+        .expect(400);
+      expect(res.text).toBe("No inc_votes on request body");
+    });
+    test("400: responds with a message when invalid value provided for inc_votes on request body", async () => {
+      const updateVotes = { inc_votes: "cat" };
+      const res = await request(app)
+        .patch("/api/comments/2")
+        .send(updateVotes)
+        .expect(400);
+      expect(res.body.message).toBe(
+        'invalid input syntax for type integer: "cat"'
+      );
+    });
+    test("400: responds with a message when invalid properties present in request body ", async () => {
+      const updateVotes = { inc_votes: "1", name: "mitch" };
+      const res = await request(app)
+        .patch("/api/comments/2")
+        .send(updateVotes)
+        .expect(400);
+      expect(res.text).toBe('The property "name" is not valid in update body');
+    });
+  });
 });
 
 describe("/api/users", () => {
@@ -393,19 +475,22 @@ describe("/api/users", () => {
   });
 });
 
-/* 
-GET api/users/:username
-200: responds with array of single user of specified username
-400: responds with error for invalid username
-404: responds with error username not found
-
-PATCH api/comments/:comment_id
-201: responds with updated object with increased votes
-201: responds with updated object with decreased votes
-201: responds with updated object with minimum vote as zero to avoid negative values
-400: responds with message for invalid review_id
-404: responds with not found for valid but non-existent review_id
-400: responds with a message for no inc_votes on request body
-400: responds with a message when invalid properties present in request body
-
-*/
+describe("/api/users/:username", () => {
+  describe("GET", () => {
+    test("200: responds with an the user with the specified username", async () => {
+      const res = await request(app).get("/api/users/bainesface").expect(200);
+      res.body.user.forEach((user) => {
+        expect(user).toHaveProperty("username");
+        expect(user.username).toBe("bainesface");
+        expect(user).toHaveProperty("avatar_url");
+        expect(user).toHaveProperty("name");
+      });
+    });
+    test("404: responds with error for username not found", async () => {
+      const res = await request(app)
+        .get("/api/users/williamyap0101")
+        .expect(404);
+      expect(res.text).toBe('Username "williamyap0101" does not exist');
+    });
+  });
+});
