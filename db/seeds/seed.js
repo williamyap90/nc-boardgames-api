@@ -11,6 +11,12 @@ const {
   createReviewsTable,
   createCommentsTable,
 } = require("./create-tables.js");
+const {
+  insertUsers,
+  insertReviews,
+  insertCategories,
+  insertComments,
+} = require("./insert-data.js");
 
 const seed = async (data) => {
   const { categoryData, commentData, reviewData, userData } = data;
@@ -25,57 +31,20 @@ const seed = async (data) => {
   await db.query(createCommentsTable);
 
   const formattedUserData = formatData(userData);
-  const userInsertString = format(
-    `
-    INSERT INTO users
-      (username, name, avatar_url)
-    VALUES
-      %L
-    RETURNING *;
-  `,
-    formattedUserData
-  );
+  const userInsertString = format(insertUsers, formattedUserData);
   await db.query(userInsertString);
 
   const formattedCategoryData = formatData(categoryData);
-  const categoryInsertString = format(
-    `
-    INSERT INTO categories
-      (slug, description)
-    VALUES
-      %L
-    RETURNING *;
-  `,
-    formattedCategoryData
-  );
+  const categoryInsertString = format(insertCategories, formattedCategoryData);
   await db.query(categoryInsertString);
 
   const formattedReviewData = formatData(reviewData);
-  const reviewInsertString = format(
-    `
-    INSERT INTO reviews
-      (title, designer, owner, review_img_url, review_body, category, created_at, votes)
-    VALUES
-      %L
-    RETURNING *;
-  `,
-    formattedReviewData
-  );
+  const reviewInsertString = format(insertReviews, formattedReviewData);
   const reviews = await db.query(reviewInsertString);
 
   const commentsRefObj = createCommentsRefObj(reviews.rows);
-
   const formattedCommentsData = formatCommentsData(commentData, commentsRefObj);
-  const commentsInsertString = format(
-    `
-    INSERT INTO comments
-      (author, review_id, votes, created_at, body)
-    VALUES
-      %L
-    RETURNING *;
-    `,
-    formattedCommentsData
-  );
+  const commentsInsertString = format(insertComments, formattedCommentsData);
   await db.query(commentsInsertString);
 };
 
