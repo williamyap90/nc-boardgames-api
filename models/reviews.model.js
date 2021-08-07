@@ -215,6 +215,22 @@ exports.insertNewComment = async ({ newComment, review_id }) => {
 exports.insertNewReview = async ({ newReview }) => {
   const { owner, title, review_body, designer, category } = newReview;
 
+  const validPostProps = [
+    "owner",
+    "title",
+    "review_body",
+    "designer",
+    "category",
+  ];
+  for (let key in newReview) {
+    if (!validPostProps.includes(key)) {
+      return Promise.reject({
+        status: 400,
+        message: `The property "${key}" is not valid in post body`,
+      });
+    }
+  }
+
   const insertString = `
         INSERT into reviews
             (owner, title, review_body, designer, category)

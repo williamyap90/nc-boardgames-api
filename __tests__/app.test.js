@@ -282,7 +282,7 @@ describe("/api/reviews", () => {
     });
   });
   describe("POST", () => {
-    test.only("201: responds with the newly added review with the correct properties", async () => {
+    test("201: responds with the newly added review with the correct properties", async () => {
       const postBody = {
         owner: "philippaclaire9",
         title: "Exploding Kittens",
@@ -304,11 +304,28 @@ describe("/api/reviews", () => {
       expect(res.body.review[0].review_id).toBe(14);
       expect(res.body.review[0]).toHaveProperty("votes");
       expect(res.body.review[0]).toHaveProperty("created_at");
-      // expect(res.body.review[0]).toHaveProperty("comment_count");
+      expect(res.body.review[0]).toHaveProperty("comment_count");
+    });
+    test.only("400: responds with a message when invalid properties are present in the body", async () => {
+      const postBody = {
+        owner: "philippaclaire9",
+        title: "Exploding Kittens",
+        review_body: "Kitty powered Russian Roulette card game",
+        designer: "Elan Lee",
+        category: "euro game",
+        age: 30,
+      };
+      const res = await request(app)
+        .post("/api/reviews")
+        .send(postBody)
+        .expect(400);
+      expect(res.text).toBe('The property "age" is not valid in post body');
     });
   });
 });
-
+// 404: responds with a review_id not found for valid value type but non-existent review_id
+// 404: responds with an error message when attempting to send post request with a username not found
+// 400: responds with an error message when attempting to send post request with body character length longer than VARCHAR(1000)
 describe("/api/reviews/:review_id/comments", () => {
   describe("GET", () => {
     test("200: responds with an array of comments for the given review_id", async () => {
