@@ -90,7 +90,7 @@ Create the following following files in the root directory:
 Run the following command, this will create the development and test databases locally, then seed the databases
 
 ```
-    npm run set-dbs
+    npm run setup-dbs
     npm run seed
 ```
 
