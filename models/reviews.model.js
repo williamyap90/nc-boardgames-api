@@ -231,6 +231,14 @@ exports.insertNewReview = async ({ newReview }) => {
     }
   }
 
+  const ownerExists = await checkExists("users", "username", owner);
+  if (!ownerExists) {
+    return Promise.reject({
+      status: 404,
+      message: `Username "${owner}" does not exist`,
+    });
+  }
+
   const insertString = `
         INSERT into reviews
             (owner, title, review_body, designer, category)
