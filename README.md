@@ -4,7 +4,7 @@
 
 - [Description](#description)
 - [Technologies](#technologies)
-- [Installation](Installation)
+- [Installation](#installation)
 - [Setting up environment variables](#setting-up-environment-variables)
 - [Seeding the database](#seeding-the-database)
 - [Running tests with Jest](#running-tests-with-jest)
