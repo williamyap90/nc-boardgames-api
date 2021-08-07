@@ -281,6 +281,32 @@ describe("/api/reviews", () => {
       expect(res.body.result.total_count).toBe(11);
     });
   });
+  describe("POST", () => {
+    test.only("201: responds with the newly added review with the correct properties", async () => {
+      const postBody = {
+        owner: "philippaclaire9",
+        title: "Exploding Kittens",
+        review_body: "Kitty powered Russian Roulette card game",
+        designer: "Elan Lee",
+        category: "euro game",
+      };
+      const res = await request(app)
+        .post("/api/reviews")
+        .send(postBody)
+        .expect(201);
+      expect(Array.isArray(res.body.review)).toBe(true);
+      expect(res.body.review[0]).toHaveProperty("owner");
+      expect(res.body.review[0]).toHaveProperty("title");
+      expect(res.body.review[0]).toHaveProperty("review_body");
+      expect(res.body.review[0]).toHaveProperty("designer");
+      expect(res.body.review[0]).toHaveProperty("category");
+      expect(res.body.review[0]).toHaveProperty("review_id");
+      expect(res.body.review[0].review_id).toBe(14);
+      expect(res.body.review[0]).toHaveProperty("votes");
+      expect(res.body.review[0]).toHaveProperty("created_at");
+      // expect(res.body.review[0]).toHaveProperty("comment_count");
+    });
+  });
 });
 
 describe("/api/reviews/:review_id/comments", () => {

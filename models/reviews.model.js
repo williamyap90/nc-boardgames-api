@@ -211,3 +211,29 @@ exports.insertNewComment = async ({ newComment, review_id }) => {
 
   return rows;
 };
+
+exports.insertNewReview = async ({ newReview }) => {
+  const { owner, title, review_body, designer, category } = newReview;
+
+  const insertString = `
+        INSERT into reviews
+            (owner, title, review_body, designer, category)
+        VALUES
+            ($1, $2, $3, $4, $5)
+        RETURNING * ;
+    `;
+  const insertValues = [owner, title, review_body, designer, category];
+  const insertResult = await db.query(insertString, insertValues);
+
+  const queryString = `
+        SELECT reviews.owner, title, reviews.review_id, review_body, designer, review_img_url, category, reviews.created_at, reviews.votes, COUNT(comment_id) AS comment_count
+        FROM reviews 
+        LEFT JOIN comments ON reviews.review_id = comments.review_id 
+        WHERE reviews.title=$1
+        GROUP BY reviews.review_id;
+    `;
+  const queryValues = [title];
+  const { rows } = await db.query(queryString, queryValues);
+
+  return rows;
+};
