@@ -177,5 +177,5 @@ Example result of the API path:
           }
         ]
       }
-    }........
+    } ...
 ```
