@@ -233,13 +233,11 @@ describe("/api/reviews", () => {
         expect(review.category).toBe("dexterity");
       });
     });
-    test("400: responds with a message when category does not exist in database", async () => {
+    test("404: responds with a message when category does not exist in database", async () => {
       const res = await request(app)
         .get("/api/reviews?category=invalidCategory")
-        .expect(400);
-      expect(res.text).toBe(
-        'Invalid request, category "invalidCategory" does not exist'
-      );
+        .expect(404);
+      expect(res.text).toBe('Category "invalidCategory" does not exist');
     });
     test("200: responds with an empty array when category exists but does not have any reviews", async () => {
       const res = await request(app)
@@ -335,9 +333,23 @@ describe("/api/reviews", () => {
         .expect(404);
       expect(res.text).toBe('Username "williamyap0101" does not exist');
     });
-    test.only("400: responds with error message when attempting to post wrong data type for property", () => {
+    test("404: responds with error message when attempting to send post request with a category not found", async () => {
       const postBody = {
-        owner: "williamyap0101",
+        owner: "philippaclaire9",
+        title: "Exploding Kittens",
+        review_body: "Kitty powered Russian Roulette card game",
+        designer: "Elan Lee",
+        category: "educational",
+      };
+      const res = await request(app)
+        .post("/api/reviews")
+        .send(postBody)
+        .expect(404);
+      expect(res.text).toBe('Category "educational" does not exist');
+    });
+    xtest("400: responds with error message when attempting to post wrong data type for property", async () => {
+      const postBody = {
+        owner: "philippaclaire9",
         title: "Exploding Kittens",
         review_body: "Kitty powered Russian Roulette card game",
         designer: "Elan Lee",
@@ -347,6 +359,7 @@ describe("/api/reviews", () => {
         .post("/api/reviews")
         .send(postBody)
         .expect(400);
+      // need to add assertions for current 400 test above
     });
   });
 });
@@ -397,7 +410,7 @@ describe("/api/reviews/:review_id/comments", () => {
   });
 
   describe("POST", () => {
-    test("200: responds with the posted comment", async () => {
+    test("201: responds with the posted comment", async () => {
       const postBody = {
         username: "mallionaire",
         body: "Thoroughly enjoyed this game!",
@@ -420,7 +433,7 @@ describe("/api/reviews/:review_id/comments", () => {
         expect(comment.body).toEqual("Thoroughly enjoyed this game!");
       });
     });
-    test("400: responds with a message when invalid properties present in post body", async () => {
+    test("201: ignores unnecessary properties", async () => {
       const postBody = {
         username: "mallionaire",
         body: "Thoroughly enjoyed this game!",
@@ -429,8 +442,30 @@ describe("/api/reviews/:review_id/comments", () => {
       const res = await request(app)
         .post("/api/reviews/2/comments")
         .send(postBody)
+        .expect(201);
+      expect(res.body.comment.length).toBe(1);
+      res.body.comment.forEach((comment) => {
+        expect(comment).toHaveProperty("review_id");
+        expect(comment.review_id).toBe(2);
+        expect(comment).toHaveProperty("comment_id");
+        expect(comment).toHaveProperty("votes");
+        expect(comment.votes).toBe(0);
+        expect(comment).toHaveProperty("created_at");
+        expect(comment).toHaveProperty("author");
+        expect(comment.author).toEqual("mallionaire");
+        expect(comment).toHaveProperty("body");
+        expect(comment.body).toEqual("Thoroughly enjoyed this game!");
+      });
+    });
+    test("400: responds with an error if either username or body is missing", async () => {
+      const postBody = {
+        username: "mallionaire",
+      };
+      const res = await request(app)
+        .post("/api/reviews/2/comments")
+        .send(postBody)
         .expect(400);
-      expect(res.text).toBe('The property "age" is not valid in post body');
+      expect(res.text).toBe("Missing property on comment post body");
     });
     test("404: responds with a review_id not found for valid value type but non-existent review_id", async () => {
       const postBody = {

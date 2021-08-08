@@ -129,8 +129,8 @@ exports.fetchReviews = async (query) => {
     const categoryExists = await checkExists("categories", "slug", category);
     if (!categoryExists) {
       return Promise.reject({
-        status: 400,
-        message: `Invalid request, category "${category}" does not exist`,
+        status: 404,
+        message: `Category "${category}" does not exist`,
       });
     }
   }
@@ -164,15 +164,12 @@ exports.fetchReviewCommentsById = async ({ review_id, query }) => {
 exports.insertNewComment = async ({ newComment, review_id }) => {
   const { username, body } = newComment;
 
-  const validPostProp = ["username", "body"];
-  // check postBody (newComment) properties
-  for (let key in newComment) {
-    if (!validPostProp.includes(key)) {
-      return Promise.reject({
-        status: 400,
-        message: `The property "${key}" is not valid in post body`,
-      });
-    }
+  // checking post body contains username & body, ignoring additional properties
+  if (!username || !body) {
+    return Promise.reject({
+      status: 400,
+      message: "Missing property on comment post body",
+    });
   }
 
   const reviewIdExists = await checkExists("reviews", "review_id", review_id);
@@ -236,6 +233,14 @@ exports.insertNewReview = async ({ newReview }) => {
     return Promise.reject({
       status: 404,
       message: `Username "${owner}" does not exist`,
+    });
+  }
+
+  const categoryExists = await checkExists("categories", "slug", category);
+  if (!categoryExists) {
+    return Promise.reject({
+      status: 404,
+      message: `Category "${category}" does not exist`,
     });
   }
 
