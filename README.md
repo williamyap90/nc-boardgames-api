@@ -104,20 +104,20 @@ To run the tests:
 See below for a full list of server endpoints:
 
 ```
-GET /api
-GET /api/categories
-POST /api/categories
-GET /api/reviews
-POST /api/reviews
-GET /api/reviews/:review_id
-PATCH /api/reviews/:review_id
-DELETE /api/reviews/:review
-GET /api/reviews/:review_id/comments
-POST /api/reviews/:review_id/comments
-DELETE /api/comments/:comment_id
-PATCH /api/comments/:comment_id
-GET /api/users
-GET /api/users/:username
+    GET /api
+    GET /api/categories
+    POST /api/categories
+    GET /api/reviews
+    POST /api/reviews
+    GET /api/reviews/:review_id
+    PATCH /api/reviews/:review_id
+    DELETE /api/reviews/:review
+    GET /api/reviews/:review_id/comments
+    POST /api/reviews/:review_id/comments
+    DELETE /api/comments/:comment_id
+    PATCH /api/comments/:comment_id
+    GET /api/users
+    GET /api/users/:username
 ```
 
 ## Examples
@@ -125,7 +125,7 @@ GET /api/users/:username
 API path url:
 
 ```
-https://nc-boardgames.herokuapp.com/api/
+    https://nc-boardgames.herokuapp.com/api/
 ```
 
 Example result of the API path:
