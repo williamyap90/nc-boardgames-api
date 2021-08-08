@@ -8,6 +8,7 @@
 - [Setting up environment variables](#setting-up-environment-variables)
 - [Seeding the database](#seeding-the-database)
 - [Running tests with Jest](#running-tests-with-jest)
+- [Complete list of endpoints](#complete-list-of-endpoints)
 
 ---
 
@@ -108,4 +109,73 @@ To run the tests:
     npm test                                 // run all tests
     npm test utils                           // run utility function tests
     npm test app                             // run app tests
+```
+
+---
+
+## Complete list of endpoints
+
+See below for a full list of server endpoints:
+
+```
+GET /api
+GET /api/categories
+POST /api/categories
+GET /api/reviews
+POST /api/reviews
+GET /api/reviews/:review_id
+PATCH /api/reviews/:review_id
+DELETE /api/reviews/:review
+GET /api/reviews/:review_id/comments
+POST /api/reviews/:review_id/comments
+DELETE /api/comments/:comment_id
+PATCH /api/comments/:comment_id
+GET /api/users
+GET /api/users/:username
+```
+
+## Examples
+
+API path url:
+
+```
+https://nc-boardgames.herokuapp.com/api/
+```
+
+Example result of the API path:
+
+```JSON
+{
+  "endpoints": {
+    "GET /api": {
+      "description": "serves up a json representation of all the available endpoints of the api"
+    },
+    "GET /api/categories": {
+      "description": "serves an array of all categories",
+      "queries": [],
+      "exampleResponse": {
+        "categories": [
+          {
+            "description": "Players attempt to uncover each other's hidden role",
+            "slug": "Social deduction"
+          }
+        ]
+      }
+    },
+    "POST /api/categories": {
+      "description": "serves an array of the newly created category",
+      "queries": [],
+      "exampleBody": {
+        "slug": "category name here",
+        "description": "description here"
+      },
+      "exampleResponse": {
+        "category": [
+          {
+            "slug": "category name here",
+            "description": "description here"
+          }
+        ]
+      }
+    }........
 ```
