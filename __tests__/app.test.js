@@ -39,7 +39,7 @@ describe("/api/categories", () => {
     });
   });
   describe("POST", () => {
-    test.only("201: responds with the newly created category ", async () => {
+    test("201: responds with the newly created category ", async () => {
       const postBody = {
         slug: "category name here",
         description: "description here",
@@ -56,13 +56,55 @@ describe("/api/categories", () => {
         expect(category.description).toBe("description here");
       });
     });
+    test("201: responds with the newly created category and ignores unnecessary properties", async () => {
+      const postBody = {
+        slug: "category name here",
+        description: "description here",
+        age: 30,
+        title: "title name here",
+        body: "lots of text for body",
+      };
+      const res = await request(app)
+        .post("/api/categories")
+        .send(postBody)
+        .expect(201);
+      expect(res.body.category).toHaveLength(1);
+      res.body.category.forEach((category) => {
+        expect(category).toHaveProperty("slug");
+        expect(category).toHaveProperty("description");
+        expect(category.slug).toBe("category name here");
+        expect(category.description).toBe("description here");
+        expect(category).not.toHaveProperty("age");
+        expect(category).not.toHaveProperty("title");
+        expect(category).not.toHaveProperty("body");
+      });
+    });
+    test("400: responds with an error if slug or description is missing", async () => {
+      const postBody = {
+        slug: "category name here",
+      };
+      const res = await request(app)
+        .post("/api/categories")
+        .send(postBody)
+        .expect(400);
+      expect(res.text).toBe("Missing required body, check slug & description");
+    });
+    test("(400: responds with an error message when post body values have character length longer than VARCHAR", async () => {
+      const postBody = {
+        slug: "category name here",
+        description: "x".repeat(201),
+      };
+      const res = await request(app)
+        .post("/api/categories")
+        .send(postBody)
+        .expect(400);
+      expect(res.body.message).toBe(
+        "value too long for type character varying(200)"
+      );
+    });
   });
 });
-// 201: ignores unnecessary properties (48 ms)
-// 400: responds with an error if either username or body is missing (68 ms)
-// 404: responds with a review_id not found for valid value type but non-existent review_id (47 ms)
-// 404: responds with an error message when attempting to send post request with a username not found (47 ms)
-// 400: responds with an error message when attempting to send post request with body character length longer than VARCHAR(1000)
+
 describe("/api/reviews/:review_id", () => {
   describe("GET", () => {
     test("200: responds with an array of the specified review_id", async () => {
@@ -484,6 +526,7 @@ describe("/api/reviews/:review_id/comments", () => {
         expect(comment.author).toEqual("mallionaire");
         expect(comment).toHaveProperty("body");
         expect(comment.body).toEqual("Thoroughly enjoyed this game!");
+        expect(comment).not.toHaveProperty("age");
       });
     });
     test("400: responds with an error if either username or body is missing", async () => {

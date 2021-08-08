@@ -14,5 +14,12 @@ exports.getCategories = (req, res, next) => {
 };
 
 exports.postCategory = (req, res, next) => {
-  insertCategory();
+  const { slug, description } = req.body;
+  insertCategory({ slug, description })
+    .then((category) => {
+      res.status(201).send({ category });
+    })
+    .catch((err) => {
+      next(err);
+    });
 };
