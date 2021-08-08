@@ -276,5 +276,12 @@ exports.removeReviewById = async ({ review_id }) => {
   const queryValues = [review_id];
 
   const { rows } = await db.query(queryString, queryValues);
+
+  if (rows.length === 0) {
+    return Promise.reject({
+      status: 404,
+      message: `Review id "${review_id}" not found`,
+    });
+  }
   return rows;
 };

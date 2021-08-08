@@ -222,7 +222,7 @@ describe("/api/reviews/:review_id", () => {
     });
   });
   describe("DELETE", () => {
-    test.only("204: responds with no content, delete the given review by review_id", async () => {
+    test("204: responds with no content, delete the given review by review_id", async () => {
       await request(app).delete("/api/reviews/2").expect(204);
       const reviewCheck = await db.query(
         "SELECT * FROM reviews WHERE review_id=2;"
@@ -234,10 +234,20 @@ describe("/api/reviews/:review_id", () => {
       );
       expect(commentsCheck.rows).toHaveLength(0);
     });
+    test("400: responds with error when attempting to delete an invalid review_id type", async () => {
+      const res = await request(app)
+        .delete("/api/reviews/invalidId")
+        .expect(400);
+      expect(res.body.message).toBe(
+        'invalid input syntax for type integer: "invalidId"'
+      );
+    });
+    test("404: responds with error when attempting to delete a review_id that is valid but does not exist", async () => {
+      const res = await request(app).delete("/api/reviews/99999").expect(404);
+      expect(res.text).toBe('Review id "99999" not found');
+    });
   });
 });
-// 400: responds with error when attempting to delete an invalid review type
-// 404 responds with error when attempting to delete a review_id that is valid but does not exist
 
 describe("/api/reviews", () => {
   describe("GET", () => {
