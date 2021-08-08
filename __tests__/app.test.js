@@ -49,6 +49,7 @@ describe("/api/reviews/:review_id", () => {
     });
     test("200: responds with an array of the specified review_id in the correct format", async () => {
       const res = await request(app).get("/api/reviews/2").expect(200);
+      expect(res.body.review).toHaveLength(1);
       res.body.review.forEach((review) => {
         expect(review).toHaveProperty("owner");
         expect(review).toHaveProperty("title");
@@ -81,6 +82,7 @@ describe("/api/reviews/:review_id", () => {
         .send(updateVotes)
         .expect(200);
       expect(res.body.review[0].votes).toEqual(8);
+      expect(res.body.review).toHaveLength(1);
       res.body.review.forEach((review) => {
         expect(review).toHaveProperty("owner");
         expect(review).toHaveProperty("title");
@@ -161,6 +163,7 @@ describe("/api/reviews", () => {
     test("200: responds with array of objects with the correct properties", async () => {
       const res = await request(app).get("/api/reviews").expect(200);
       expect(Array.isArray(res.body.result.reviews)).toBe(true);
+      expect(res.body.result.reviews).toHaveLength(10);
       res.body.result.reviews.forEach((review) => {
         expect(review).toHaveProperty("owner");
         expect(review).toHaveProperty("title");
@@ -221,6 +224,7 @@ describe("/api/reviews", () => {
         .get("/api/reviews?category=dexterity")
         .expect(200);
       expect(Array.isArray(res.body.result.reviews)).toBe(true);
+      expect(res.body.result.reviews).toHaveLength(1);
       res.body.result.reviews.forEach((review) => {
         expect(review).toHaveProperty("owner");
         expect(review).toHaveProperty("title");
@@ -369,7 +373,7 @@ describe("/api/reviews/:review_id/comments", () => {
     test("200: responds with an array of comments for the given review_id", async () => {
       const res = await request(app).get("/api/reviews/2/comments").expect(200);
       expect(Array.isArray(res.body.comments)).toBe(true);
-      expect(res.body.comments.length).toBe(3);
+      expect(res.body.comments).toHaveLength(3);
       res.body.comments.forEach((comment) => {
         expect(comment).toHaveProperty("comment_id");
         expect(comment).toHaveProperty("votes");
@@ -419,7 +423,7 @@ describe("/api/reviews/:review_id/comments", () => {
         .post("/api/reviews/2/comments")
         .send(postBody)
         .expect(201);
-      expect(res.body.comment.length).toBe(1);
+      expect(res.body.comment).toHaveLength(1);
       res.body.comment.forEach((comment) => {
         expect(comment).toHaveProperty("review_id");
         expect(comment.review_id).toBe(2);
@@ -443,7 +447,7 @@ describe("/api/reviews/:review_id/comments", () => {
         .post("/api/reviews/2/comments")
         .send(postBody)
         .expect(201);
-      expect(res.body.comment.length).toBe(1);
+      expect(res.body.comment).toHaveLength(1);
       res.body.comment.forEach((comment) => {
         expect(comment).toHaveProperty("review_id");
         expect(comment.review_id).toBe(2);
@@ -532,6 +536,7 @@ describe("/api/comments/:comment_id", () => {
         .patch("/api/comments/2")
         .send(updateVotes)
         .expect(200);
+      expect(res.body.comment).toHaveLength(1);
       res.body.comment.forEach((comment) => {
         expect(comment).toHaveProperty("comment_id");
         expect(comment).toHaveProperty("author");
@@ -550,6 +555,7 @@ describe("/api/comments/:comment_id", () => {
         .patch("/api/comments/2")
         .send(updateVotes)
         .expect(200);
+      expect(res.body.comment).toHaveLength(1);
       res.body.comment.forEach((comment) => {
         expect(comment).toHaveProperty("comment_id");
         expect(comment).toHaveProperty("author");
@@ -614,6 +620,7 @@ describe("/api/users", () => {
     test("200: responds with an array of users", async () => {
       const res = await request(app).get("/api/users").expect(200);
       expect(Array.isArray(res.body.users)).toBe(true);
+      expect(res.body.users).toHaveLength(4);
       res.body.users.forEach((user) => {
         expect(user).toHaveProperty("username");
         expect(user).toHaveProperty("avatar_url");
@@ -627,6 +634,7 @@ describe("/api/users/:username", () => {
   describe("GET", () => {
     test("200: responds with an the user with the specified username", async () => {
       const res = await request(app).get("/api/users/bainesface").expect(200);
+      expect(res.body.user).toHaveLength(1);
       res.body.user.forEach((user) => {
         expect(user).toHaveProperty("username");
         expect(user.username).toBe("bainesface");
