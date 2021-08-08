@@ -351,11 +351,11 @@ describe("/api/reviews", () => {
         .expect(404);
       expect(res.text).toBe('Category "educational" does not exist');
     });
-    xtest("400: responds with error message when attempting to post wrong data type for property", async () => {
+    test("400: responds with an error message when attempting to send post request with body exceeding VARCHAR length", async () => {
       const postBody = {
         owner: "philippaclaire9",
         title: "Exploding Kittens",
-        review_body: "Kitty powered Russian Roulette card game",
+        review_body: "x".repeat(1001),
         designer: "Elan Lee",
         category: "euro game",
       };
@@ -363,11 +363,13 @@ describe("/api/reviews", () => {
         .post("/api/reviews")
         .send(postBody)
         .expect(400);
-      // need to add assertions for current 400 test above
+      expect(res.body.message).toBe(
+        "value too long for type character varying(1000)"
+      );
     });
   });
 });
-// 400: responds with an error message when attempting to send post request with body character length longer than VARCHAR(1000)
+
 describe("/api/reviews/:review_id/comments", () => {
   describe("GET", () => {
     test("200: responds with an array of comments for the given review_id", async () => {

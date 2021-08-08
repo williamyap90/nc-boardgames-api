@@ -5,6 +5,8 @@ exports.handleRouter404s = (req, res, next) => {
 exports.handlePSQLErrors = (err, req, res, next) => {
   if (err.code === "22P02") {
     res.status(400).send({ message: err.message });
+  } else if (err.code === "22001") {
+    res.status(400).send({ message: err.message });
   } else {
     next(err);
   }
