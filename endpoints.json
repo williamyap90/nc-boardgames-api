@@ -14,6 +14,22 @@
       ]
     }
   },
+  "POST /api/categories": {
+    "description": "serves an array of the newly created category",
+    "queries": [],
+    "exampleBody": {
+      "slug": "category name here",
+      "description": "description here"
+    },
+    "exampleResponse": {
+      "category": [
+        {
+          "slug": "category name here",
+          "description": "description here"
+        }
+      ]
+    }
+  },
   "GET /api/reviews": {
     "description": "serves an array of all reviews",
     "queries": ["category", "sort_by", "order", "page", "limit"],
@@ -32,6 +48,32 @@
         ],
         "total_count": 13
       }
+    }
+  },
+  "POST /api/reviews": {
+    "description": "serves an array of the newly created review",
+    "queries": [],
+    "exampleBody": {
+      "owner": "philippaclaire9",
+      "title": "Exploding Kittens",
+      "review_body": "Kitty powered Russian Roulette card game",
+      "designer": "Elan Lee",
+      "category": "euro game"
+    },
+    "exampleResponse": {
+      "review": [
+        {
+          "review_id": 14,
+          "title": "Exploding Kittens",
+          "designer": "Elan Lee",
+          "owner": "philippaclaire9",
+          "review_img_url": "https://images.pexels.com/photos/5350049/pexels-photo-5350049.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
+          "category": "euro game",
+          "created_at": 1610964101251,
+          "votes": 5,
+          "comment_count": 0
+        }
+      ]
     }
   },
   "GET /api/reviews/:review_id": {
@@ -72,6 +114,11 @@
         }
       ]
     }
+  },
+  "DELETE /api/reviews/:review": {
+    "description": "deletes the review for the specified review_id",
+    "queries": [],
+    "response": "204 no content"
   },
   "GET /api/reviews/:review_id/comments": {
     "description": "serves an array of comments on reviews for the specified review_id",
