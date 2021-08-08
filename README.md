@@ -10,8 +10,6 @@
 - [Running tests with Jest](#running-tests-with-jest)
 - [Complete list of endpoints](#complete-list-of-endpoints)
 
----
-
 ## Description
 
 This project is an application created for the purpose of accessing application data programmatically.
@@ -19,8 +17,6 @@ This project is an application created for the purpose of accessing application 
 The intention is to build a backend service mimicking the functionality real world services such as Reddit, Twitter and could be adapted for other services. The API will provide the information to the front end architecture.
 
 Link to the hosted NC-Boardgames API [here](https://nc-boardgames.herokuapp.com/api/).
-
----
 
 ## Technologies
 
@@ -42,8 +38,6 @@ Dev dependencies:
 - [Jest-sorted](https://www.npmjs.com/package/jest-sorted) v1.0.12
 - [SuperTest](https://www.npmjs.com/package/supertest) v6.1.4
 
----
-
 ## Installation
 
 To install NC-Boardgames API, follow these steps:
@@ -64,8 +58,6 @@ To install NC-Boardgames API, follow these steps:
     npm install -D jest jest-sorted supertest
 ```
 
----
-
 ## Setting up environment variables
 
 Variable environment files will need to be setup locally as they have been added to `.gitignore`.
@@ -84,8 +76,6 @@ Create the following following files in the root directory:
     PGDATABASE=nc_games_test
 ```
 
----
-
 ## Seeding the database
 
 Run `setup-dbs` to create the development and test databases locally, then seed the databases by running `seed`.
@@ -96,8 +86,6 @@ Run `setup-dbs` to create the development and test databases locally, then seed 
 ```
 
 Information for table structure including column names, variable types, limits and foreign key references can be found in `create-tables.js` within the `/db/seeds` folder.
-
----
 
 ## Running tests with Jest
 
@@ -110,8 +98,6 @@ To run the tests:
     npm test utils                           // run utility function tests
     npm test app                             // run app tests
 ```
-
----
 
 ## Complete list of endpoints
 
