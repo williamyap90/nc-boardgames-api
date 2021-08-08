@@ -81,7 +81,11 @@ exports.postReview = (req, res, next) => {
 
 exports.deleteReviewById = (req, res, next) => {
   const { review_id } = req.params;
-  removeReviewById({ review_id }).then((deleted) => {
-    res.status(204).send();
-  });
+  removeReviewById({ review_id })
+    .then((deleted) => {
+      res.status(204).send();
+    })
+    .catch((err) => {
+      next(err);
+    });
 };
