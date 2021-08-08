@@ -38,8 +38,31 @@ describe("/api/categories", () => {
       });
     });
   });
+  describe("POST", () => {
+    test.only("201: responds with the newly created category ", async () => {
+      const postBody = {
+        slug: "category name here",
+        description: "description here",
+      };
+      const res = await request(app)
+        .post("/api/categories")
+        .send(postBody)
+        .expect(201);
+      expect(res.body.category).toHaveLength(1);
+      res.body.category.forEach((category) => {
+        expect(category).toHaveProperty("slug");
+        expect(category).toHaveProperty("description");
+        expect(category.slug).toBe("category name here");
+        expect(category.description).toBe("description here");
+      });
+    });
+  });
 });
-
+// 201: ignores unnecessary properties (48 ms)
+// 400: responds with an error if either username or body is missing (68 ms)
+// 404: responds with a review_id not found for valid value type but non-existent review_id (47 ms)
+// 404: responds with an error message when attempting to send post request with a username not found (47 ms)
+// 400: responds with an error message when attempting to send post request with body character length longer than VARCHAR(1000)
 describe("/api/reviews/:review_id", () => {
   describe("GET", () => {
     test("200: responds with an array of the specified review_id", async () => {
