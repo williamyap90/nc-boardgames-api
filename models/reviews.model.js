@@ -1,68 +1,6 @@
 const db = require("../db/connection");
 const { checkExists } = require("../helpers");
 
-exports.fetchReviewById = async ({ review_id }) => {
-  const queryValue = [review_id];
-  let queryString = `
-        SELECT reviews.owner, title, reviews.review_id, review_body, designer, review_img_url, category, reviews.created_at, reviews.votes, COUNT(comment_id) AS comment_count
-        FROM reviews 
-        LEFT JOIN comments ON reviews.review_id = comments.review_id 
-        WHERE reviews.review_id=$1
-        GROUP BY reviews.review_id;
-    `;
-
-  const { rows } = await db.query(queryString, queryValue);
-
-  if (rows.length === 0) {
-    return Promise.reject({
-      status: 404,
-      message: `Review id ${review_id} not found`,
-    });
-  }
-  return rows;
-};
-
-exports.patchReviewById = async ({ updateBody, review_id }) => {
-  const validUpdates = ["inc_votes"];
-  // check updateBody properties
-  for (let key in updateBody) {
-    if (!validUpdates.includes(key)) {
-      return Promise.reject({
-        status: 400,
-        message: `The property "${key}" is not valid in update body`,
-      });
-    }
-  }
-
-  const { inc_votes } = updateBody;
-
-  if (!inc_votes) {
-    return Promise.reject({
-      status: 400,
-      message: "No inc_votes on request body",
-    });
-  }
-
-  const queryValues = [review_id, inc_votes];
-
-  let queryString = `
-        UPDATE reviews
-        SET votes = (CASE WHEN (votes + $2) >= 0 THEN votes + $2 ELSE 0 END)
-        WHERE review_id = $1
-        RETURNING *;
-    `;
-
-  const { rows } = await db.query(queryString, queryValues);
-
-  if (rows.length === 0) {
-    return Promise.reject({
-      status: 404,
-      message: `Review id ${review_id} not found`,
-    });
-  }
-  return rows;
-};
-
 exports.fetchReviews = async (query) => {
   const {
     sort_by = "created_at",
@@ -138,6 +76,145 @@ exports.fetchReviews = async (query) => {
   return { reviews: rows, total_count: totalCount };
 };
 
+exports.insertNewReview = async ({ newReview }) => {
+  const { owner, title, review_body, designer, category } = newReview;
+
+  const validPostProps = [
+    "owner",
+    "title",
+    "review_body",
+    "designer",
+    "category",
+  ];
+  for (let key in newReview) {
+    if (!validPostProps.includes(key)) {
+      return Promise.reject({
+        status: 400,
+        message: `The property "${key}" is not valid in post body`,
+      });
+    }
+  }
+
+  const ownerExists = await checkExists("users", "username", owner);
+  if (!ownerExists) {
+    return Promise.reject({
+      status: 404,
+      message: `Username "${owner}" does not exist`,
+    });
+  }
+
+  const categoryExists = await checkExists("categories", "slug", category);
+  if (!categoryExists) {
+    return Promise.reject({
+      status: 404,
+      message: `Category "${category}" does not exist`,
+    });
+  }
+
+  const insertString = `
+        INSERT into reviews
+            (owner, title, review_body, designer, category)
+        VALUES
+            ($1, $2, $3, $4, $5)
+        RETURNING * ;
+    `;
+  const insertValues = [owner, title, review_body, designer, category];
+  const insertResult = await db.query(insertString, insertValues);
+
+  const queryString = `
+        SELECT reviews.owner, title, reviews.review_id, review_body, designer, review_img_url, category, reviews.created_at, reviews.votes, COUNT(comment_id) AS comment_count
+        FROM reviews 
+        LEFT JOIN comments ON reviews.review_id = comments.review_id 
+        WHERE reviews.title=$1
+        GROUP BY reviews.review_id;
+    `;
+  const queryValues = [title];
+  const { rows } = await db.query(queryString, queryValues);
+
+  return rows;
+};
+
+exports.fetchReviewById = async ({ review_id }) => {
+  const queryValue = [review_id];
+  let queryString = `
+        SELECT reviews.owner, title, reviews.review_id, review_body, designer, review_img_url, category, reviews.created_at, reviews.votes, COUNT(comment_id) AS comment_count
+        FROM reviews 
+        LEFT JOIN comments ON reviews.review_id = comments.review_id 
+        WHERE reviews.review_id=$1
+        GROUP BY reviews.review_id;
+    `;
+
+  const { rows } = await db.query(queryString, queryValue);
+
+  if (rows.length === 0) {
+    return Promise.reject({
+      status: 404,
+      message: `Review id ${review_id} not found`,
+    });
+  }
+  return rows;
+};
+
+exports.patchReviewById = async ({ updateBody, review_id }) => {
+  const validUpdates = ["inc_votes"];
+  // check updateBody properties
+  for (let key in updateBody) {
+    if (!validUpdates.includes(key)) {
+      return Promise.reject({
+        status: 400,
+        message: `The property "${key}" is not valid in update body`,
+      });
+    }
+  }
+
+  const { inc_votes } = updateBody;
+
+  if (!inc_votes) {
+    return Promise.reject({
+      status: 400,
+      message: "No inc_votes on request body",
+    });
+  }
+
+  const queryValues = [review_id, inc_votes];
+
+  let queryString = `
+        UPDATE reviews
+        SET votes = (CASE WHEN (votes + $2) >= 0 THEN votes + $2 ELSE 0 END)
+        WHERE review_id = $1
+        RETURNING *;
+    `;
+
+  const { rows } = await db.query(queryString, queryValues);
+
+  if (rows.length === 0) {
+    return Promise.reject({
+      status: 404,
+      message: `Review id ${review_id} not found`,
+    });
+  }
+  return rows;
+};
+
+exports.removeReviewById = async ({ review_id }) => {
+  const queryString = `
+        DELETE FROM reviews
+        WHERE review_id = $1
+        RETURNING *;
+    `;
+  const queryValues = [review_id];
+
+  const { rows } = await db.query(queryString, queryValues);
+
+  if (rows.length === 0) {
+    return Promise.reject({
+      status: 404,
+      message: `Review id "${review_id}" not found`,
+    });
+  }
+  return rows;
+};
+
 exports.fetchReviewCommentsById = async ({ review_id, query }) => {
   const { limit = 10, page = 1 } = query;
 
@@ -206,82 +283,5 @@ exports.insertNewComment = async ({ newComment, review_id }) => {
 
   const { rows } = await db.query(queryString, queryValues);
 
-  return rows;
-};
-
-exports.insertNewReview = async ({ newReview }) => {
-  const { owner, title, review_body, designer, category } = newReview;
-
-  const validPostProps = [
-    "owner",
-    "title",
-    "review_body",
-    "designer",
-    "category",
-  ];
-  for (let key in newReview) {
-    if (!validPostProps.includes(key)) {
-      return Promise.reject({
-        status: 400,
-        message: `The property "${key}" is not valid in post body`,
-      });
-    }
-  }
-
-  const ownerExists = await checkExists("users", "username", owner);
-  if (!ownerExists) {
-    return Promise.reject({
-      status: 404,
-      message: `Username "${owner}" does not exist`,
-    });
-  }
-
-  const categoryExists = await checkExists("categories", "slug", category);
-  if (!categoryExists) {
-    return Promise.reject({
-      status: 404,
-      message: `Category "${category}" does not exist`,
-    });
-  }
-
-  const insertString = `
-        INSERT into reviews
-            (owner, title, review_body, designer, category)
-        VALUES
-            ($1, $2, $3, $4, $5)
-        RETURNING * ;
-    `;
-  const insertValues = [owner, title, review_body, designer, category];
-  const insertResult = await db.query(insertString, insertValues);
-
-  const queryString = `
-        SELECT reviews.owner, title, reviews.review_id, review_body, designer, review_img_url, category, reviews.created_at, reviews.votes, COUNT(comment_id) AS comment_count
-        FROM reviews 
-        LEFT JOIN comments ON reviews.review_id = comments.review_id 
-        WHERE reviews.title=$1
-        GROUP BY reviews.review_id;
-    `;
-  const queryValues = [title];
-  const { rows } = await db.query(queryString, queryValues);
-
-  return rows;
-};
-
-exports.removeReviewById = async ({ review_id }) => {
-  const queryString = `
-        DELETE FROM reviews
-        WHERE review_id = $1
-        RETURNING *;
-    `;
-  const queryValues = [review_id];
-
-  const { rows } = await db.query(queryString, queryValues);
-
-  if (rows.length === 0) {
-    return Promise.reject({
-      status: 404,
-      message: `Review id "${review_id}" not found`,
-    });
-  }
   return rows;
 };
