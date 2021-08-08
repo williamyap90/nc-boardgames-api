@@ -266,3 +266,15 @@ exports.insertNewReview = async ({ newReview }) => {
 
   return rows;
 };
+
+exports.removeReviewById = async ({ review_id }) => {
+  const queryString = `
+        DELETE FROM reviews
+        WHERE review_id = $1
+        RETURNING *;
+    `;
+  const queryValues = [review_id];
+
+  const { rows } = await db.query(queryString, queryValues);
+  return rows;
+};

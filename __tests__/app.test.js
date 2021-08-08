@@ -221,7 +221,23 @@ describe("/api/reviews/:review_id", () => {
       expect(res.text).toBe('The property "name" is not valid in update body');
     });
   });
+  describe("DELETE", () => {
+    test.only("204: responds with no content, delete the given review by review_id", async () => {
+      await request(app).delete("/api/reviews/2").expect(204);
+      const reviewCheck = await db.query(
+        "SELECT * FROM reviews WHERE review_id=2;"
+      );
+      expect(reviewCheck.rows).toHaveLength(0);
+
+      const commentsCheck = await db.query(
+        "SELECT * FROM comments WHERE review_id=2;"
+      );
+      expect(commentsCheck.rows).toHaveLength(0);
+    });
+  });
 });
+// 400: responds with error when attempting to delete an invalid review type
+// 404 responds with error when attempting to delete a review_id that is valid but does not exist
 
 describe("/api/reviews", () => {
   describe("GET", () => {
