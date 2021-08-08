@@ -87,15 +87,25 @@ Create the following following files in the root directory:
 
 ## Seeding the database
 
-Run the following command, this will create the development and test databases locally, then seed the databases
+Run `setup-dbs` to create the development and test databases locally, then seed the databases by running `seed`.
 
 ```
     npm run setup-dbs
     npm run seed
 ```
 
+Information for table structure including column names, variable types, limits and foreign key references can be found in `create-tables.js` within the `/db/seeds` folder.
+
 ---
 
 ## Running tests with Jest
 
-<!-- Provide clear instructions of how to clone, install dependencies, seed local database, and run tests-->
+The project was written with utilising TDD (Test Driven Development) as the main focus, the test suites for `app.js` and `utils.js` which tests all of the functionality of this backend service can be found in the `__tests__` folder.
+
+To run the tests:
+
+```
+    npm test                                 // run all tests
+    npm test utils                           // run utility function tests
+    npm test app                             // run app tests
+```
