@@ -8,6 +8,28 @@ const {
   removeReviewById,
 } = require("../models/reviews.model");
 
+exports.getReviews = (req, res, next) => {
+  const query = req.query;
+  fetchReviews(query)
+    .then((result) => {
+      res.status(200).send({ result });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.postReview = (req, res, next) => {
+  const newReview = req.body;
+  insertNewReview({ newReview })
+    .then((review) => {
+      res.status(201).send({ review });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
 exports.getReviewById = (req, res, next) => {
   const { review_id } = req.params;
 
@@ -33,11 +55,11 @@ exports.updateReviewById = (req, res, next) => {
     });
 };
 
-exports.getReviews = (req, res, next) => {
-  const query = req.query;
-  fetchReviews(query)
-    .then((result) => {
-      res.status(200).send({ result });
+exports.deleteReviewById = (req, res, next) => {
+  const { review_id } = req.params;
+  removeReviewById({ review_id })
+    .then((deleted) => {
+      res.status(204).send();
     })
     .catch((err) => {
       next(err);
@@ -62,28 +84,6 @@ exports.postNewComment = (req, res, next) => {
   insertNewComment({ newComment, review_id })
     .then((comment) => {
       res.status(201).send({ comment });
-    })
-    .catch((err) => {
-      next(err);
-    });
-};
-
-exports.postReview = (req, res, next) => {
-  const newReview = req.body;
-  insertNewReview({ newReview })
-    .then((review) => {
-      res.status(201).send({ review });
-    })
-    .catch((err) => {
-      next(err);
-    });
-};
-
-exports.deleteReviewById = (req, res, next) => {
-  const { review_id } = req.params;
-  removeReviewById({ review_id })
-    .then((deleted) => {
-      res.status(204).send();
     })
     .catch((err) => {
       next(err);
