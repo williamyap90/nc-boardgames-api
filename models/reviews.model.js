@@ -157,7 +157,7 @@ exports.fetchReviewById = async ({ review_id }) => {
 
 exports.patchReviewById = async ({ updateBody, review_id }) => {
   const validUpdates = ["inc_votes"];
-  // check updateBody properties
+
   for (let key in updateBody) {
     if (!validUpdates.includes(key)) {
       return Promise.reject({
@@ -241,7 +241,6 @@ exports.fetchReviewCommentsById = async ({ review_id, query }) => {
 exports.insertNewComment = async ({ newComment, review_id }) => {
   const { username, body } = newComment;
 
-  // checking post body contains username & body, ignoring additional properties
   if (!username || !body) {
     return Promise.reject({
       status: 400,
