@@ -89,7 +89,7 @@ describe("/api/categories", () => {
         .expect(400);
       expect(res.text).toBe("Missing required body, check slug & description");
     });
-    test("(400: responds with an error message when post body values have character length longer than VARCHAR", async () => {
+    test("400: responds with an error message when post body values have character length longer than VARCHAR", async () => {
       const postBody = {
         slug: "category name here",
         description: "x".repeat(201),
@@ -139,7 +139,7 @@ describe("/api/reviews/:review_id", () => {
       expect(res.text).toBe("Review id 99999 not found");
     });
   });
-  describe("PATCH", () => {
+  describe("PATCH votes", () => {
     test("200: responds with the updated object for specified review_id when increasing votes", async () => {
       const updateVotes = { inc_votes: 3 };
       const res = await request(app)
@@ -200,7 +200,7 @@ describe("/api/reviews/:review_id", () => {
         .patch("/api/reviews/2")
         .send(updateBody)
         .expect(400);
-      expect(res.text).toBe("No inc_votes on request body");
+      expect(res.text).toBe("No valid properties on request body");
     });
     test("400: responds with a message when invalid value provided for inc_votes on request body", async () => {
       const updateBody = { inc_votes: "cat" };
@@ -245,6 +245,66 @@ describe("/api/reviews/:review_id", () => {
     test("404: responds with error when attempting to delete a review_id that is valid but does not exist", async () => {
       const res = await request(app).delete("/api/reviews/99999").expect(404);
       expect(res.text).toBe('Review id "99999" not found');
+    });
+  });
+  describe("PATCH review_body", () => {
+    test("200: responds with the object which includes the updated review_body", async () => {
+      const updateBody = {
+        review_body: "Avoid the werewolf to win the game!",
+      };
+      const res = await request(app)
+        .patch("/api/reviews/3")
+        .send(updateBody)
+        .expect(200);
+      expect(res.body.review).toHaveLength(1);
+      res.body.review.forEach((review) => {
+        expect(review).toHaveProperty("review_id");
+        expect(review.review_id).toBe(3);
+        expect(review).toHaveProperty("title");
+        expect(review.title).toBe("Ultimate Werewolf");
+        expect(review).toHaveProperty("review_body");
+        expect(review.review_body).toBe("Avoid the werewolf to win the game!");
+        expect(review).toHaveProperty("designer");
+        expect(review).toHaveProperty("review_img_url");
+        expect(review).toHaveProperty("votes");
+        expect(review).toHaveProperty("category");
+        expect(review).toHaveProperty("owner");
+        expect(review).toHaveProperty("created_at");
+      });
+    });
+    test("400: responds with a message for invalid review_id ", async () => {
+      const updateBody = {
+        review_body: "Avoid the werewolf to win the game!",
+      };
+      const res = await request(app)
+        .patch("/api/reviews/notAnId")
+        .send(updateBody)
+        .expect(400);
+      expect(res.body.message).toBe(
+        'invalid input syntax for type integer: "notAnId"'
+      );
+    });
+    test("400: responds with error message when attempting to patch with body character length longer than 1000 characters", async () => {
+      const updateBody = {
+        review_body: "x".repeat(1001),
+      };
+      const res = await request(app)
+        .patch("/api/reviews/1")
+        .send(updateBody)
+        .expect(400);
+      expect(res.body.message).toBe(
+        "value too long for type character varying(1000)"
+      );
+    });
+    test("400: responds with error message if body is null", async () => {
+      const updateBody = {
+        review_body: "",
+      };
+      const res = await request(app)
+        .patch("/api/reviews/1")
+        .send(updateBody)
+        .expect(400);
+      expect(res.text).toBe("Review body cannot be null");
     });
   });
 });
@@ -623,7 +683,7 @@ describe("/api/comments/:comment_id", () => {
       );
     });
   });
-  describe("PATCH", () => {
+  describe("PATCH votes", () => {
     test("200: responds with updated object with increased votes ", async () => {
       const updateVotes = { inc_votes: 3 };
       const res = await request(app)
@@ -686,7 +746,7 @@ describe("/api/comments/:comment_id", () => {
         .patch("/api/comments/2")
         .send(updateVotes)
         .expect(400);
-      expect(res.text).toBe("No inc_votes on request body");
+      expect(res.text).toBe("No valid properties on request body");
     });
     test("400: responds with a message when invalid value provided for inc_votes on request body", async () => {
       const updateVotes = { inc_votes: "cat" };
@@ -705,6 +765,52 @@ describe("/api/comments/:comment_id", () => {
         .send(updateVotes)
         .expect(400);
       expect(res.text).toBe('The property "name" is not valid in update body');
+    });
+  });
+  describe("PATCH comment body", () => {
+    test("200: returns the object with updated body", async () => {
+      const updateBody = {
+        body: "Not keen on this game",
+      };
+      const res = await request(app)
+        .patch("/api/comments/1")
+        .send(updateBody)
+        .expect(200);
+      expect(res.body.comment).toHaveLength(1);
+      res.body.comment.forEach((comment) => {
+        expect(comment).toHaveProperty("comment_id");
+        expect(comment.comment_id).toBe(1);
+        expect(comment).toHaveProperty("author");
+        expect(comment.author).toBe("bainesface");
+        expect(comment).toHaveProperty("review_id");
+        expect(comment.review_id).toBe(2);
+        expect(comment).toHaveProperty("votes");
+        expect(comment).toHaveProperty("created_at");
+        expect(comment).toHaveProperty("body");
+        expect(comment.body).toBe("Not keen on this game");
+      });
+    });
+    test("400: responds with error message when attempting to patch with body character length longer than 1000 characters", async () => {
+      const updateBody = {
+        body: "x".repeat(1001),
+      };
+      const res = await request(app)
+        .patch("/api/comments/1")
+        .send(updateBody)
+        .expect(400);
+      expect(res.body.message).toBe(
+        "value too long for type character varying(1000)"
+      );
+    });
+    test("400: responds with error message if body is null", async () => {
+      const updateBody = {
+        body: "",
+      };
+      const res = await request(app)
+        .patch("/api/comments/1")
+        .send(updateBody)
+        .expect(400);
+      expect(res.text).toBe("Comment body cannot be null");
     });
   });
 });
@@ -744,3 +850,13 @@ describe("/api/users/:username", () => {
     });
   });
 });
+
+/*
+Patch: Edit a user's information
+Get: Search for an review by title
+Post: add a new user
+
+Get: Add functionality to get reviews created in last 10 minutes
+Get: Get all reviews that have been liked by a user. This will require an additional junction table.
+Research and implement online image storage or random generation of images for categories
+*/
