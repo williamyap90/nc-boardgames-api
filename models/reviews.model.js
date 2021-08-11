@@ -169,6 +169,13 @@ exports.patchReviewById = async ({ updateBody, review_id }) => {
 
   const { inc_votes, review_body } = updateBody;
 
+  if (updateBody.hasOwnProperty("review_body") && review_body.length === 0) {
+    return Promise.reject({
+      status: 400,
+      message: "Review body cannot be null",
+    });
+  }
+
   if (!inc_votes && !review_body) {
     return Promise.reject({
       status: 400,
