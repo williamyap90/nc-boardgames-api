@@ -26,5 +26,13 @@ exports.getUserByUsername = (req, res, next) => {
 };
 
 exports.updateUserByUsername = (req, res, next) => {
-  patchUserByUsername();
+  const { username } = req.params;
+  const updateUser = req.body;
+  patchUserByUsername({ username, updateUser })
+    .then((user) => {
+      res.status(200).send({ user });
+    })
+    .catch((err) => {
+      next(err);
+    });
 };

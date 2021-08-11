@@ -850,9 +850,9 @@ describe("/api/users/:username", () => {
     });
   });
   describe("PATCH", () => {
-    test.only("200: responds with the updated user ", async () => {
+    test("200: responds with the updated user when changing name", async () => {
       const updateUser = {
-        name: "bainsey123",
+        name: "bainsey",
       };
       const res = await request(app)
         .patch("/api/users/bainesface")
@@ -861,16 +861,53 @@ describe("/api/users/:username", () => {
       expect(res.body.user).toHaveLength(1);
       res.body.user.forEach((user) => {
         expect(user).toHaveProperty("username");
-        expect(user.username).toBe("bainsey123");
         expect(user).toHaveProperty("avatar_url");
         expect(user).toHaveProperty("name");
+        expect(user.name).toBe("bainsey");
       });
+    });
+    test("200: responds with the updated user when changing avatar_url", async () => {
+      const updateUser = {
+        avatar_url: "http://imgurl.com/001.img",
+      };
+      const res = await request(app)
+        .patch("/api/users/bainesface")
+        .send(updateUser)
+        .expect(200);
+      expect(res.body.user).toHaveLength(1);
+      res.body.user.forEach((user) => {
+        expect(user).toHaveProperty("username");
+        expect(user).toHaveProperty("avatar_url");
+        expect(user.avatar_url).toBe("http://imgurl.com/001.img");
+        expect(user).toHaveProperty("name");
+      });
+    });
+    test("400: responds with error message when attempting to patch with body character length longer than 1000 characters", async () => {
+      const updateUser = {
+        avatar_url: "a".repeat(201),
+      };
+      const res = await request(app)
+        .patch("/api/users/bainesface")
+        .send(updateUser)
+        .expect(400);
+      expect(res.body.message).toBe(
+        "value too long for type character varying(200)"
+      );
+    });
+    test("400: responds with error message when attempting to patch body with null fields", async () => {
+      const updateUser = {
+        avatar_url: "",
+      };
+      const res = await request(app)
+        .patch("/api/users/bainesface")
+        .send(updateUser)
+        .expect(400);
+      expect(res.text).toBe("Comment body cannot be null");
     });
   });
 });
 
 /*
-Patch: Edit a user's information
 //not null
 //exceeds varchar limit
 Get: Search for an review by title
