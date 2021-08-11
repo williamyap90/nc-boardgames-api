@@ -1,3 +1,4 @@
+const { query } = require("../db/connection");
 const db = require("../db/connection");
 const { checkExists } = require("../helpers");
 
@@ -26,8 +27,8 @@ exports.removeCommentById = async ({ comment_id }) => {
 };
 
 exports.patchCommentById = async ({ comment_id, updateVotes }) => {
-  const { inc_votes } = updateVotes;
-  const validUpdates = ["inc_votes"];
+  const { inc_votes, body } = updateVotes;
+  const validUpdates = ["inc_votes", "body"];
 
   for (let key in updateVotes) {
     if (!validUpdates.includes(key)) {
@@ -38,20 +39,32 @@ exports.patchCommentById = async ({ comment_id, updateVotes }) => {
     }
   }
 
-  if (!inc_votes) {
+  if (updateVotes.hasOwnProperty("body") && body.length === 0) {
     return Promise.reject({
       status: 400,
-      message: "No inc_votes on request body",
+      message: "Comment body cannot be null",
     });
   }
 
-  const queryValues = [comment_id, inc_votes];
-  const queryString = `
-      UPDATE comments
-      SET votes = votes + $2
-      WHERE comment_id = $1
-      RETURNING *;
-  `;
+  if (!inc_votes && !body) {
+    return Promise.reject({
+      status: 400,
+      message: "No valid properties on request body",
+    });
+  }
+
+  const queryValues = [comment_id];
+  let queryString = `UPDATE comments `;
+
+  if (inc_votes) {
+    queryValues.push(inc_votes);
+    queryString += `SET votes = votes + $2`;
+  }
+  if (body) {
+    queryValues.push(body);
+    queryString += `SET body = $2`;
+  }
+  queryString += ` WHERE comment_id = $1 RETURNING *;`;
 
   const { rows } = await db.query(queryString, queryValues);
   if (rows.length === 0) {
