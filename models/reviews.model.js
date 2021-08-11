@@ -156,7 +156,7 @@ exports.fetchReviewById = async ({ review_id }) => {
 };
 
 exports.patchReviewById = async ({ updateBody, review_id }) => {
-  const validUpdates = ["inc_votes"];
+  const validUpdates = ["inc_votes", "review_body"];
 
   for (let key in updateBody) {
     if (!validUpdates.includes(key)) {
@@ -167,23 +167,27 @@ exports.patchReviewById = async ({ updateBody, review_id }) => {
     }
   }
 
-  const { inc_votes } = updateBody;
+  const { inc_votes, review_body } = updateBody;
 
-  if (!inc_votes) {
+  if (!inc_votes && !review_body) {
     return Promise.reject({
       status: 400,
-      message: "No inc_votes on request body",
+      message: "No valid properties on request body",
     });
   }
 
-  const queryValues = [review_id, inc_votes];
+  const queryValues = [review_id];
+  let queryString = `UPDATE reviews `;
 
-  let queryString = `
-        UPDATE reviews
-        SET votes = (CASE WHEN (votes + $2) >= 0 THEN votes + $2 ELSE 0 END)
-        WHERE review_id = $1
-        RETURNING *;
-    `;
+  if (inc_votes) {
+    queryValues.push(inc_votes);
+    queryString += `SET votes = (CASE WHEN (votes + $2) >= 0 THEN votes + $2 ELSE 0 END)`;
+  }
+  if (review_body) {
+    queryValues.push(review_body);
+    queryString += `SET review_body = $2`;
+  }
+  queryString += ` WHERE review_id = $1 RETURNING *;`;
 
   const { rows } = await db.query(queryString, queryValues);
 
