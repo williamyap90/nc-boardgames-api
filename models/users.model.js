@@ -35,7 +35,7 @@ exports.patchUserByUsername = async ({ username, updateUser }) => {
   ) {
     return Promise.reject({
       status: 400,
-      message: "Comment body cannot be null",
+      message: "User body cannot be null",
     });
   }
 

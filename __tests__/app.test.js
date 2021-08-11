@@ -902,7 +902,7 @@ describe("/api/users/:username", () => {
         .patch("/api/users/bainesface")
         .send(updateUser)
         .expect(400);
-      expect(res.text).toBe("Comment body cannot be null");
+      expect(res.text).toBe("User body cannot be null");
     });
   });
 });
