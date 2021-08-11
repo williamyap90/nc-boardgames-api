@@ -7,7 +7,7 @@ const {
 
 usersRouter.get("/", getUsers);
 usersRouter
-  .route(":/username")
+  .route("/:username")
   .get(getUserByUsername)
   .patch(updateUserByUsername);
 
