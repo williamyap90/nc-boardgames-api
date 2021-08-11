@@ -849,10 +849,30 @@ describe("/api/users/:username", () => {
       expect(res.text).toBe('Username "williamyap0101" does not exist');
     });
   });
+  describe("PATCH", () => {
+    test.only("200: responds with the updated user ", async () => {
+      const updateUser = {
+        username: "bainsey",
+      };
+      const res = await request(app)
+        .get("/api/users/bainesface")
+        .send(updateUser)
+        .expect(200);
+      expect(res.body.user).toHaveLength(1);
+      res.body.user.forEach((user) => {
+        expect(user).toHaveProperty("username");
+        expect(user.username).toBe("bainsey");
+        expect(user).toHaveProperty("avatar_url");
+        expect(user).toHaveProperty("name");
+      });
+    });
+  });
 });
 
 /*
 Patch: Edit a user's information
+//not null
+//exceeds varchar limit
 Get: Search for an review by title
 Post: add a new user
 

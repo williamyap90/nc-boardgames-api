@@ -1,4 +1,8 @@
-const { fetchUsers, fetchUserByUsername } = require("../models/users.model");
+const {
+  fetchUsers,
+  fetchUserByUsername,
+  patchUserByUsername,
+} = require("../models/users.model");
 
 exports.getUsers = (req, res, next) => {
   fetchUsers()
@@ -19,4 +23,8 @@ exports.getUserByUsername = (req, res, next) => {
     .catch((err) => {
       next(err);
     });
+};
+
+exports.updateUserByUsername = (req, res, next) => {
+  patchUserByUsername();
 };

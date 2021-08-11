@@ -24,3 +24,7 @@ exports.fetchUserByUsername = async ({ username }) => {
   const result = await db.query(queryString, queryValues);
   return result.rows;
 };
+
+exports.patchUserByUsername = async () => {
+  console.log("in users model");
+};
