@@ -2,12 +2,13 @@ const db = require("../db/connection");
 const { checkExists } = require("../helpers");
 
 exports.fetchReviews = async (query) => {
-  const {
+  let {
     sort_by = "created_at",
     order = "asc",
     category,
     limit = 10,
     page = 1,
+    title,
   } = query;
 
   const validColumns = [
@@ -35,6 +36,18 @@ exports.fetchReviews = async (query) => {
     });
   }
 
+  if (title) title = title[0].toUpperCase() + title.slice(1);
+
+  if (title) {
+    const titleExists = await checkExists("reviews", "title", title);
+    if (!titleExists) {
+      return Promise.reject({
+        status: 400,
+        message: `Title "${title}" does not exist`,
+      });
+    }
+  }
+
   const offset = (page - 1) * limit;
 
   const queryValues = [limit, offset];
@@ -45,6 +58,11 @@ exports.fetchReviews = async (query) => {
   if (category) {
     queryValues.push(category);
     queryString += "WHERE category = $3 ";
+  }
+
+  if (title) {
+    queryValues.push(title);
+    queryString += "WHERE title = $3 ";
   }
   const queryStringEnd = `
         GROUP BY reviews.review_id

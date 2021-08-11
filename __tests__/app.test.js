@@ -433,6 +433,28 @@ describe("/api/reviews", () => {
       expect(res.body.result).toHaveProperty("total_count");
       expect(res.body.result.total_count).toBe(11);
     });
+    test("200: returns array of reviews filtered by title", async () => {
+      const res = await request(app)
+        .get("/api/reviews?title=jenga")
+        .expect(200);
+      expect(res.body.result.reviews).toHaveLength(1);
+      res.body.result.reviews.forEach((review) => {
+        expect(review).toHaveProperty("title");
+        expect(review.title).toBe("Jenga");
+        expect(review).toHaveProperty("owner");
+        expect(review).toHaveProperty("review_id");
+        expect(review).toHaveProperty("category");
+        expect(review).toHaveProperty("review_img_url");
+        expect(review).toHaveProperty("votes");
+        expect(review).toHaveProperty("comment_count");
+      });
+    });
+    test("400: returns an error when title query is provided and does not exist", async () => {
+      const res = await request(app)
+        .get("/api/reviews?title=exploding+kittens")
+        .expect(400);
+      expect(res.text).toBe('Title "Exploding kittens" does not exist');
+    });
   });
   describe("POST", () => {
     test("201: responds with the newly added review with the correct properties", async () => {
@@ -907,13 +929,10 @@ describe("/api/users/:username", () => {
   });
 });
 
-/*
+//Post: add a new user
 //not null
 //exceeds varchar limit
-Get: Search for an review by title
-Post: add a new user
 
-Get: Add functionality to get reviews created in last 10 minutes
-Get: Get all reviews that have been liked by a user. This will require an additional junction table.
-Research and implement online image storage or random generation of images for categories
-*/
+//Get: Add functionality to get reviews created in last 10 minutes
+//Get: Get all reviews that have been liked by a user. This will require an additional junction table.
+//Research and implement online image storage or random generation of images for categories
