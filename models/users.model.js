@@ -7,6 +7,23 @@ exports.fetchUsers = async () => {
   return result.rows;
 };
 
+exports.insertNewUser = async (newUserBody) => {
+  const { username, avatar_url, name } = newUserBody;
+
+  const queryString = `
+      INSERT INTO users
+          (username, avatar_url, name)
+      VALUES
+          ($1, $2, $3)
+      RETURNING *;
+    `;
+  const queryValues = [username, avatar_url, name];
+
+  const { rows } = await db.query(queryString, queryValues);
+
+  return rows;
+};
+
 exports.fetchUserByUsername = async ({ username }) => {
   const usernameExists = await checkExists("users", "username", username);
   if (!usernameExists) {

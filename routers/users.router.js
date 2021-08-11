@@ -3,9 +3,10 @@ const {
   getUsers,
   getUserByUsername,
   updateUserByUsername,
+  postNewUser,
 } = require("../controllers/users.controller");
 
-usersRouter.get("/", getUsers);
+usersRouter.route("/").get(getUsers).post(postNewUser);
 usersRouter
   .route("/:username")
   .get(getUserByUsername)

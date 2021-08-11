@@ -2,6 +2,7 @@ const {
   fetchUsers,
   fetchUserByUsername,
   patchUserByUsername,
+  insertNewUser,
 } = require("../models/users.model");
 
 exports.getUsers = (req, res, next) => {
@@ -12,6 +13,13 @@ exports.getUsers = (req, res, next) => {
     .catch((err) => {
       next(err);
     });
+};
+
+exports.postNewUser = (req, res, next) => {
+  const newUserBody = req.body;
+  insertNewUser(newUserBody).then((user) => {
+    res.status(201).send({ user });
+  });
 };
 
 exports.getUserByUsername = (req, res, next) => {

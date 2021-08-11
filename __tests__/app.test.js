@@ -850,6 +850,29 @@ describe("/api/users", () => {
       });
     });
   });
+  describe("POST", () => {
+    test.only("201: responds with the newly added user", async () => {
+      const newUserBody = {
+        username: "williamyap123",
+        avatar_url: "http://profilepic.com/williamyap123.jpg",
+        name: "will",
+      };
+      const res = await request(app)
+        .post("/api/users")
+        .send(newUserBody)
+        .expect(201);
+      expect(typeof res.body).toBe("object");
+      expect(res.body.user).toHaveLength(1);
+      res.body.user.forEach((user) => {
+        expect(user).toHaveProperty("username");
+        expect(user).toHaveProperty("avatar_url");
+        expect(user).toHaveProperty("name");
+        expect(user.username).toBe("williamyap123");
+        expect(user.avatar_url).toBe("http://profilepic.com/williamyap123.jpg");
+        expect(user.name).toBe("will");
+      });
+    });
+  });
 });
 
 describe("/api/users/:username", () => {
