@@ -852,16 +852,16 @@ describe("/api/users/:username", () => {
   describe("PATCH", () => {
     test.only("200: responds with the updated user ", async () => {
       const updateUser = {
-        username: "bainsey",
+        name: "bainsey123",
       };
       const res = await request(app)
-        .get("/api/users/bainesface")
+        .patch("/api/users/bainesface")
         .send(updateUser)
         .expect(200);
       expect(res.body.user).toHaveLength(1);
       res.body.user.forEach((user) => {
         expect(user).toHaveProperty("username");
-        expect(user.username).toBe("bainsey");
+        expect(user.username).toBe("bainsey123");
         expect(user).toHaveProperty("avatar_url");
         expect(user).toHaveProperty("name");
       });
