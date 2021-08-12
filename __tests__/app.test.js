@@ -874,6 +874,8 @@ describe("/api/users", () => {
     });
   });
 });
+//not null
+//exceeds varchar limit
 
 describe("/api/users/:username", () => {
   describe("GET", () => {
@@ -951,10 +953,6 @@ describe("/api/users/:username", () => {
     });
   });
 });
-
-//Post: add a new user
-//not null
-//exceeds varchar limit
 
 //Get: Add functionality to get reviews created in last 10 minutes
 //Get: Get all reviews that have been liked by a user. This will require an additional junction table.
