@@ -98,7 +98,11 @@
   },
   "PATCH /api/reviews/:review_id": {
     "description": "serves an array of a single updated object with new values",
-    "queries": ["inc_votes"],
+    "queries": ["inc_votes", "review_body"],
+    "exampleReviewBody": {
+      "review_body": "Avoid the werewolf to win the game!"
+    },
+    "exampleVotesBody": { "inc_votes": 3 },
     "exampleResponse": {
       "review": [
         {
@@ -161,9 +165,12 @@
     "response": "204 no content"
   },
   "PATCH /api/comments/:comment_id": {
-    "description": "serves an array containing the specified comment_id with updated votes",
+    "description": "serves an array containing the specified comment_id with updated votes or comment body",
     "queries": [],
-    "exampleBody": { "inc_votes": 3 },
+    "exampleVotesBody": { "inc_votes": 3 },
+    "exampleCommentBody": {
+      "body": "Not keen on this game"
+    },
     "exampleResponse": {
       "comment": [
         {
@@ -195,6 +202,24 @@
       ]
     }
   },
+  "POST /api/users": {
+    "description": "serves an array of newly added user",
+    "queries": [],
+    "exampleBody": {
+      "username": "williamyap123",
+      "avatar_url": "http://profilepic.com/williamyap123.jpg",
+      "name": "will"
+    },
+    "exampleResponse": {
+      "user": [
+        {
+          "username": "williamyap123",
+          "avatar_url": "http://profilepic.com/williamyap123.jpg",
+          "name": "will"
+        }
+      ]
+    }
+  },
   "GET /api/users/:username": {
     "description": "serves an array a single user of the specified username",
     "queries": [],
@@ -204,6 +229,22 @@
           "username": "philippaclaire9",
           "avatar_url": "https://avatars2.githubusercontent.com/u/24604688?s=460&v=4",
           "name": "philippa"
+        }
+      ]
+    }
+  },
+  "PATCH /api/users/:username": {
+    "description": "serves an array a single user with updated details",
+    "queries": [],
+    "exampleBody": {
+      "name": "bainsey"
+    },
+    "exampleResponse": {
+      "user": [
+        {
+          "username": "bainesface",
+          "avatar_url": "https://avatars2.githubusercontent.com/u/24394918?s=400&v=4",
+          "name": "bainsey"
         }
       ]
     }
