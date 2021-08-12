@@ -875,7 +875,7 @@ describe("/api/users", () => {
   });
 });
 //not null
-//exceeds varchar limit
+//exceeds varchar
 
 describe("/api/users/:username", () => {
   describe("GET", () => {
