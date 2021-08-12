@@ -117,7 +117,9 @@ See below for a full list of server endpoints:
     DELETE /api/comments/:comment_id
     PATCH /api/comments/:comment_id
     GET /api/users
+    POST /api/users
     GET /api/users/:username
+    PATCH /api/users/:username
 ```
 
 ## Examples
