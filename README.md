@@ -28,7 +28,7 @@ The technologies and packages used for this project are listed below:
 Project dependencies:
 
 - [Express](https://expressjs.com/) v4.17.1
-- [Node-postgres](https://www.postgresql.org/) v8.7.1
+- [Node-postgres](https://node-postgres.com/) v8.7.1
 - [Dotenv](https://www.npmjs.com/package/dotenv) v10.0.0
 - [PG-format](https://www.npmjs.com/package/pg-format) v1.0.4
 
