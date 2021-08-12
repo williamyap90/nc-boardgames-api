@@ -10,6 +10,17 @@ exports.fetchUsers = async () => {
 exports.insertNewUser = async (newUserBody) => {
   const { username, avatar_url, name } = newUserBody;
 
+  if (
+    (newUserBody.hasOwnProperty("username") && username.length === 0) ||
+    (newUserBody.hasOwnProperty("avatar_url") && avatar_url.length === 0) ||
+    (newUserBody.hasOwnProperty("name") && name.length === 0)
+  ) {
+    return Promise.reject({
+      status: 400,
+      message: "Post new user body cannot contain null values",
+    });
+  }
+
   const queryString = `
       INSERT INTO users
           (username, avatar_url, name)

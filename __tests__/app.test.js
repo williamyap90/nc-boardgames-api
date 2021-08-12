@@ -851,7 +851,7 @@ describe("/api/users", () => {
     });
   });
   describe("POST", () => {
-    test.only("201: responds with the newly added user", async () => {
+    test("201: responds with the newly added user", async () => {
       const newUserBody = {
         username: "williamyap123",
         avatar_url: "http://profilepic.com/williamyap123.jpg",
@@ -871,11 +871,86 @@ describe("/api/users", () => {
         expect(user.avatar_url).toBe("http://profilepic.com/williamyap123.jpg");
         expect(user.name).toBe("will");
       });
+      const newUser = await db.query(
+        "SELECT * FROM users WHERE username='williamyap123';"
+      );
+      expect(newUser.rows).toHaveLength(1);
+      newUser.rows.forEach((user) => {
+        expect(user).toHaveProperty("username");
+        expect(user).toHaveProperty("avatar_url");
+        expect(user).toHaveProperty("name");
+        expect(user.username).toBe("williamyap123");
+        expect(user.avatar_url).toBe("http://profilepic.com/williamyap123.jpg");
+        expect(user.name).toBe("will");
+      });
+    });
+    test("201: ignores unnecessary properties", async () => {
+      const newUserBody = {
+        username: "williamyap123",
+        avatar_url: "http://profilepic.com/williamyap123.jpg",
+        name: "will",
+        age: 31,
+        address: "my address, postcode",
+      };
+      const res = await request(app)
+        .post("/api/users")
+        .send(newUserBody)
+        .expect(201);
+      expect(typeof res.body).toBe("object");
+      expect(res.body.user).toHaveLength(1);
+      res.body.user.forEach((user) => {
+        expect(user).toHaveProperty("username");
+        expect(user).toHaveProperty("avatar_url");
+        expect(user).toHaveProperty("name");
+        expect(user.username).toBe("williamyap123");
+        expect(user.avatar_url).toBe("http://profilepic.com/williamyap123.jpg");
+        expect(user.name).toBe("will");
+        expect(user).not.toHaveProperty("age");
+        expect(user).not.toHaveProperty("address");
+      });
+    });
+    test("400: responds with an error if either any not null data is missing", async () => {
+      const newUserBody = {
+        username: "",
+        avatar_url: "http://profilepic.com/williamyap123.jpg",
+        name: "will",
+      };
+      const res = await request(app)
+        .post("/api/users")
+        .send(newUserBody)
+        .expect(400);
+      expect(res.text).toBe("Post new user body cannot contain null values");
+    });
+    test("400: responds with an error if username are greater than varchar limit of 100", async () => {
+      const newUserBody = {
+        username: "x".repeat(101),
+        avatar_url: "http://profilepic.com/williamyap123.jpg",
+        name: "will",
+      };
+      const res = await request(app)
+        .post("/api/users")
+        .send(newUserBody)
+        .expect(400);
+      expect(res.body.message).toBe(
+        "value too long for type character varying(100)"
+      );
+    });
+    test("400: responds with an error if username are greater than varchar limit of 100", async () => {
+      const newUserBody = {
+        username: "williamyap213",
+        avatar_url: "x".repeat(2000),
+        name: "will",
+      };
+      const res = await request(app)
+        .post("/api/users")
+        .send(newUserBody)
+        .expect(400);
+      expect(res.body.message).toBe(
+        "value too long for type character varying(200)"
+      );
     });
   });
 });
-//not null
-//exceeds varchar
 
 describe("/api/users/:username", () => {
   describe("GET", () => {

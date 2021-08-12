@@ -17,9 +17,13 @@ exports.getUsers = (req, res, next) => {
 
 exports.postNewUser = (req, res, next) => {
   const newUserBody = req.body;
-  insertNewUser(newUserBody).then((user) => {
-    res.status(201).send({ user });
-  });
+  insertNewUser(newUserBody)
+    .then((user) => {
+      res.status(201).send({ user });
+    })
+    .catch((err) => {
+      next(err);
+    });
 };
 
 exports.getUserByUsername = (req, res, next) => {
