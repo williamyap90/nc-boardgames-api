@@ -6,7 +6,10 @@ const {
   postNewUser,
 } = require("../controllers/users.controller");
 
-usersRouter.route("/").get(getUsers).post(postNewUser);
+usersRouter
+  .route("/")
+  .get(getUsers)
+  .post(postNewUser);
 usersRouter
   .route("/:username")
   .get(getUserByUsername)

@@ -4,6 +4,9 @@ const {
   postCategory,
 } = require("../controllers/categories.controller");
 
-categoriesRouter.route("/").get(getCategories).post(postCategory);
+categoriesRouter
+  .route("/")
+  .get(getCategories)
+  .post(postCategory);
 
 module.exports = categoriesRouter;

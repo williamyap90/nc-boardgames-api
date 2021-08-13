@@ -9,7 +9,10 @@ const {
   deleteReviewById,
 } = require("../controllers/reviews.controller");
 
-reviewsRouter.route("/").get(getReviews).post(postReview);
+reviewsRouter
+  .route("/")
+  .get(getReviews)
+  .post(postReview);
 reviewsRouter
   .route("/:review_id")
   .get(getReviewById)
