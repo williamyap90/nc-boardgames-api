@@ -362,9 +362,9 @@ describe("/api/reviews", () => {
         descending: true,
       });
     });
-    test("400: responds with a message when attempting to order by an invalid value", async () => {
+    test.only("400: responds with a message when attempting to order by an invalid value", async () => {
       const res = await request(app)
-        .get("/api/reviews?votes&order=invalidOrder")
+        .get("/api/reviews?sort_by=votes&order=invalidOrder")
         .expect(400);
       expect(res.text).toBe(
         'Invalid order by query, cannot order by "invalidOrder"'
